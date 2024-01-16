@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+
+<body>
+    <div class="float-right mt-2">
+        <button type="button" class="btn btn-outline-danger" onclick="logout()">Logout</button>
+    </div>
+</div>
+
+    <div class="container mt-5">
+        <h1 class="mb-4">Welcome to the Library</h1>
+
+        
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Display All Books</h5>
+                        <p class="card-text">View the complete list of books available in the library.</p>
+                        <a href="/frontend/list_book.html" class="btn btn-primary" onclick="displayAllBooks()">View
+                            Books</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Display All Customers</h5>
+                        <p class="card-text">Explore the list of all registered library customers.</p>
+                        <a href="/frontend/customer_list.html" class="btn btn-primary"
+                            onclick="displayAllCustomers()">View Customers</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Display All Loans</h5>
+                        <p class="card-text">Check the current loans in the library.</p>
+                        <a href="/frontend/loans_list.html" class="btn btn-primary" onclick="displayAllLoans()">View
+                            Loans</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Display Late Loans</h5>
+                        <p class="card-text">View loans that are overdue.</p>
+                        <a href="/frontend/late_loans.html" class="btn btn-warning" onclick="displayLateLoans()">View
+                            Late Loans</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Find Book by Name</h5>
+                        <p class="card-text">Search for a specific book by its name.</p>
+                        <a href="/frontend/find_book.html" class="btn btn-info" onclick="findBookByName()">Find Book</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Find Customer by Name</h5>
+                        <p class="card-text">Search for a customer by their name.</p>
+                        <a href="/frontend/find_customer.html" class="btn btn-info" onclick="findCustomerByName()">Find
+                            Customer</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Add a Book</h5>
+                        <p class="card-text">Contribute to the library by adding a new book.</p>
+                        <a href="/frontend/add_book.html" class="btn btn-success">Add Book</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Add a Customer</h5>
+                        <p class="card-text">Register a new customer to the library.</p>
+                        <a href="/frontend/add_customer.html" class="btn btn-success">Add Customer</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Add a Loan</h5>
+                        <p class="card-text">Borrow a book by creating a new loan.</p>
+                        <a href="/frontend/add_loan.html" class="btn btn-success">Add Loan</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+
+
+        <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Return a book</h5>
+                        <p class="card-text">return the book u have loan</p>
+                        <a href="/frontend/Return_book.html" class="btn btn-danger">return book</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+    <!-- Include your JavaScript functions for library actions -->
+    <script>
+         const MY_SERVER = "http://127.0.0.1:5000";
+
+const logout = async () => {
+    try {
+        const response = await axios.post(
+            `${MY_SERVER}/logout`,
+            {},
+            {
+                headers: {
+                    Authorization: `Bearer ${sessionStorage.getItem("access_token")}`
+                }
+            }
+        );
+
+        Toastify({
+                    text: "Logout successful. Goodbye!",
+                    duration: 3000
+                }).showToast();
+
+        // Handle successful logout, for example, redirect to login page
+        window.location.href = "/frontend/login.html";
+    } catch (error) {
+        console.error("Logout failed:", error);
+        Toastify({
+            text: "Logout failed. Please try again.",
+            duration: 3000
+        }).showToast();
+    }
+};
+
+
+    </script>
+
+</body>
+
+</html>

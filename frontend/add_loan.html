@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Loan</title>
+    <!-- Bootstrap CSS link (make sure to include Bootstrap in your project) -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <!-- Custom CSS for styling -->
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #007bff;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container mt-5">
+        <h1 class="mb-4">Library Management System</h1>
+
+        <div class="container mt-5">
+            <h1>Add Loan</h1>
+            <form id="addLoanForm" method="post">
+                <div class="form-group">
+                    <label for="customerName">Customer Name:</label>
+                    <select id="customerName" name="customer_name" class="form-control" required>
+                        <!-- Customers will be dynamically added here -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="bookName">Book Name:</label>
+                    <select id="bookName" name="book_name" class="form-control" required>
+                        <!-- Books will be dynamically added here -->
+                    </select>
+                </div>
+                <button type="button" onclick="addLoan()" class="btn btn-primary">Add Loan</button>
+            </form>
+        </div>
+
+        <!-- Bootstrap JS and Popper.js (make sure to include Bootstrap JS and Popper.js in your project) -->
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+        <!-- Axios (make sure to include Axios in your project) -->
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+        <script>
+            const MY_SERVER = "http://127.0.0.1:5000";
+
+            // Fetch the list of books and populate the dropdown
+            async function fetchBooks() {
+                try {
+                    const response = await axios.get(`${MY_SERVER}/listbooks`);
+                    const books = response.data.books;
+
+                    const bookDropdown = document.getElementById("bookName");
+                    books.forEach(book => {
+                        const option = document.createElement("option");
+                        option.value = book.name;
+                        option.textContent = book.name;
+                        bookDropdown.appendChild(option);
+                    });
+                } catch (error) {
+                    console.error("Error fetching books:", error);
+                }
+            }
+
+            // Fetch the list of customers and populate the dropdown
+            async function fetchCustomers() {
+                try {
+                    const response = await axios.get(`${MY_SERVER}/listcustomers`);
+                    const customers = response.data.customers;
+
+                    const customerDropdown = document.getElementById("customerName");
+                    customers.forEach(customer => {
+                        const option = document.createElement("option");
+                        option.value = customer.name;
+                        option.textContent = customer.name;
+                        customerDropdown.appendChild(option);
+                    });
+                } catch (error) {
+                    console.error("Error fetching customers:", error);
+                }
+            }
+
+            // Call fetchBooks and fetchCustomers when the page loads
+            fetchBooks();
+            fetchCustomers();
+
+            function addLoan() {
+                var form = document.getElementById("addLoanForm");
+                var formData = new FormData(form);
+
+                axios.post(`${MY_SERVER}/addloan`, Object.fromEntries(formData))
+                    .then(response => {
+                        alert(response.data.message);
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            }
+        </script>
+    </body>
+</html>

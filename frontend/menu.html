@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background: url('library.jpg') center center fixed;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 600px;
+            margin-top: 50px;
+            background-color: rgba(0, 0, 0, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-group-vertical .btn {
+            color: #fff;
+            background-color: #330eec;
+            border: 1px solid #007bff;
+            margin-bottom: 10px;
+        }
+
+        .btn-group-vertical .btn-warning {
+            background-color: #10100f;
+            border-color: #ffc107;
+        }
+
+        .btn-group-vertical .btn-info {
+            background-color: #000000;
+            border-color: #17a2b8;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .logo img {
+            width: 150px; /* Adjust the size as needed */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="logo">
+            <img src="library.jpg" alt="Library Logo">
+        </div>
+        <h1 class="mb-4" style="color: white;">Library Management System</h1>
+
+        <div class="btn-group-vertical">
+            <a href="/frontend/home.html" class="btn btn-primary" onclick="displayAllBooks()">Home page</a>
+            <a href="/frontend/list_book.html" class="btn btn-primary" onclick="displayAllBooks()">Display All
+                Books</a>
+            <a href="/frontend/customer_list.html" class="btn btn-primary" onclick="displayAllCustomers()">Display
+                All Customers</a>
+            <a href="/frontend/loans_list.html" class="btn btn-primary" onclick="displayAllLoans()">Display All Loans</a>
+            <a href="/frontend/late_loans.html" class="btn btn-warning" onclick="displayLateLoans()">Display Late Loans</a>
+            <a href="/frontend/find_book.html" class="btn btn-info" onclick="findBookByName()">Find Book by Name</a>
+            <a href="/frontend/find_customer.html" class="btn btn-info" onclick="findCustomerByName()">Find Customer
+                by Name</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        // Your existing JavaScript functions...
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>

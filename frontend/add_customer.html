@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Customer</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">Library Management System</h1>
+
+        <div class="btn-group-vertical">
+            <a href="/frontend/home.html" class="btn btn-primary"  onclick="displayAllBooks()">Home page</a>
+            <a href="/frontend/list_book.html" class="btn btn-primary"  onclick="displayAllBooks()">Display All Books</a>
+            <a href="/frontend/customer_list.html" class="btn btn-primary" onclick="displayAllCustomers()">Display All Customers</a>
+            <a href="/frontend/loans_list.html" class="btn btn-primary" onclick="displayAllLoans()">Display All Loans</a>
+            <a href="/frontend/late_loans.html" class="btn btn-warning" onclick="displayLateLoans()">Display Late Loans</a>
+            <a href="/frontend/find_book.html" class="btn btn-info" onclick="findBookByName()">Find Book by Name</a>
+            <a href="/frontend/find_customer.html" class="btn btn-info" onclick="findCustomerByName()">Find Customer by Name</a>
+        </div>
+    </div>
+    <h1>Add Customer</h1>
+    <form id="addCustomerForm" method="post">
+        <label for="customerName">Customer Name:</label>
+        <input type="text" id="customerName" name="name" required>
+        <br>
+        <label for="customerCity">Customer City:</label>
+        <input type="text" id="customerCity" name="city" required>
+        <br>
+        <label for="customerAge">Customer Age:</label>
+        <input type="text" id="customerAge" name="age" required>
+        <br>
+        <button type="button" class="btn btn-primary" onclick="addCustomer()">Add Customer</button>
+    </form>
+
+    <script>
+        const MY_SERVER = "http://127.0.0.1:5000";
+        function addCustomer() {
+            var form = document.getElementById("addCustomerForm");
+            var formData = new FormData(form);
+
+            axios.post(`${MY_SERVER}/addcustomer`, Object.fromEntries(formData))
+                .then(response => {
+                    alert(response.data.message);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+    </script>
+</body>
+</html>

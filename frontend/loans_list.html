@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>List of Loans</title>
+    <!-- Add Bootstrap stylesheet link -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="btn-group-vertical">
+        <a href="/frontend/home.html" class="btn btn-primary"  onclick="displayAllBooks()">Home page</a>   
+        <a href="/frontend/list_book.html" class="btn btn-primary"  onclick="displayAllBooks()">Display All Books</a>
+        <a href="/frontend/customer_list.html" class="btn btn-primary" onclick="displayAllCustomers()">Display All Customers</a>
+        <a href="/frontend/loans_list.html" class="btn btn-primary" onclick="displayAllLoans()">Display All Loans</a>
+        <a href="/frontend/late_loans.html" class="btn btn-warning" onclick="displayLateLoans()">Display Late Loans</a>
+        <a href="/frontend/find_book.html" class="btn btn-info" onclick="findBookByName()">Find Book by Name</a>
+        <a href="/frontend/find_customer.html" class="btn btn-info" onclick="findCustomerByName()">Find Customer by Name</a>
+    </div>
+</div>
+    <div class="container mt-5">
+        <h1>List of Loans</h1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Loan Date</th>
+                    <th>Return Date</th>
+                    <th>customer name</th>
+                    <th>Book name</th>
+                </tr>
+            </thead>
+            <tbody id="loanListBody">
+                <!-- Loan list will be dynamically populated here -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Add Bootstrap scripts (jQuery and Popper.js) -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <!-- Add Bootstrap script -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+    <!-- Add Axios library -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <script>
+        const MY_SERVER = "http://127.0.0.1:5000";
+
+        // Fetch and display the list of loans on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            fetchLoanList();
+        });
+
+        function fetchLoanList() {
+            axios.get(`${MY_SERVER}/listloans`)
+                .then(response => {
+                    const loanList = response.data.loans;
+                    displayLoanList(loanList);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+        function displayLoanList(loanList) {
+        const loanListBody = document.getElementById('loanListBody');
+
+        // Clear existing rows
+        loanListBody.innerHTML = "";
+
+        // Populate the table with loan data, customer name, and book name
+        loanList.forEach(loan => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${loan.id}</td>
+                <td>${loan.loan_date}</td>
+                <td>${loan.return_date}</td>
+                <td>${loan.customer_name}</td>
+                <td>${loan.book_name}</td>
+            `;
+            loanListBody.appendChild(row);
+        });
+    }
+    </script>
+</body>
+</html>

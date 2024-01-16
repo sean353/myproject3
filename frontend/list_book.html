@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>List of Books</title>
+    <!-- Add Bootstrap stylesheet link -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <style>
+        body {
+            background: url('BOOK.jpg') center center fixed;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 800px;
+            margin-top: 50px;
+        }
+
+        h1 {
+            color: #007bff;
+            margin-top: -200px;
+        }
+
+        table {
+            background-color: #0b0a0a;
+            box-shadow: 0 0 10px rgba(3, 3, 3, 0.961);
+            margin-top: -10px;
+        }
+
+        th, td {
+            text-align: center;
+            color: rgb(255, 255, 255);
+        }
+    </style>
+</head>
+<body>
+    <div class="btn-group-vertical">
+        <a href="/frontend/home.html" class="btn btn-primary" onclick="displayAllBooks()">Home page</a>   
+        <a href="/frontend/list_book.html" class="btn btn-primary" onclick="displayAllBooks()">Display All Books</a>
+        <a href="/frontend/customer_list.html" class="btn btn-primary" onclick="displayAllCustomers()">Display All Customers</a>
+        <a href="/frontend/loans_list.html" class="btn btn-primary" onclick="displayAllLoans()">Display All Loans</a>
+        <a href="/frontend/late_loans.html" class="btn btn-warning" onclick="displayLateLoans()">Display Late Loans</a>
+        <a href="/frontend/find_book.html" class="btn btn-info" onclick="findBookByName()">Find Book by Name</a>
+        <a href="/frontend/find_customer.html" class="btn btn-info" onclick="findCustomerByName()">Find Customer by Name</a>
+    </div>
+
+    <div class="container mt-5">
+        <h1>List of Books</h1>
+        <table class="table table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Author</th>
+                    <th>Year Published</th>
+                    <th>Book Type</th>
+                </tr>
+            </thead>
+            <tbody id="bookListBody">
+                <!-- Book list will be dynamically populated here -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Add Bootstrap scripts (jQuery and Popper.js) -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <!-- Add Bootstrap script -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+    <!-- Add Axios library -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <script>
+        const MY_SERVER = "http://127.0.0.1:5000";
+
+        // Fetch and display the list of books on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            fetchBookList();
+        });
+
+        function fetchBookList() {
+            axios.get(`${MY_SERVER}/listbooks`)
+                .then(response => {
+                    const bookList = response.data.books;
+                    displayBookList(bookList);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+        function displayBookList(bookList) {
+            const bookListBody = document.getElementById('bookListBody');
+
+            // Clear existing rows
+            bookListBody.innerHTML = "";
+
+            // Populate the table with book data
+            bookList.forEach(book => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${book.id}</td>
+                    <td>${book.name}</td>
+                    <td>${book.author}</td>
+                    <td>${book.year_published}</td>
+                    <td>${book.book_type}</td>
+                `;
+                bookListBody.appendChild(row);
+            });
+        }
+    </script>
+</body>
+</html>

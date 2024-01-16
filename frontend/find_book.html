@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Book by Name</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="btn-group-vertical">
+        <a href="/frontend/home.html" class="btn btn-primary" onclick="displayAllBooks()">Home page</a>
+        <!-- Add other navigation buttons as needed -->
+    </div>
+
+    <div class="container mt-5">
+        <h1 class="mb-4">Find Book by Name</h1>
+
+        <form id="findBookForm">
+            <div class="form-group">
+                <label for="searchBookName">Select Book:</label>
+                <select class="form-control" id="bookDropdown">
+                    <!-- Books will be dynamically populated here -->
+                </select>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="findBookByName()">Find Book</button>
+        </form>
+
+        <div id="bookResultSection"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        const MY_SERVER = 'http://127.0.0.1:5000'; // Replace with your actual Flask server URL
+
+        // Fetch and populate the book dropdown on page load
+        axios.get(`${MY_SERVER}/listbooks`)
+            .then(response => populateBookDropdown(response.data.books))
+            .catch(error => console.error('Error fetching books:', error));
+
+        function populateBookDropdown(books) {
+            const bookDropdown = document.getElementById('bookDropdown');
+
+            books.forEach(book => {
+                const option = document.createElement('option');
+                option.value = book.name;
+                option.text = book.name;
+                bookDropdown.appendChild(option);
+            });
+        }
+
+        function findBookByName() {
+            const selectedBook = document.getElementById('bookDropdown').value;
+
+            axios.get(`${MY_SERVER}/findbook/${selectedBook}`)
+                .then(response => displayBookResult(response.data))
+                .catch(error => displayBookResult({ error: error.message }));
+        }
+
+        function displayBookResult(bookResult) {
+            const bookResultSection = document.getElementById('bookResultSection');
+            bookResultSection.innerHTML = '';
+
+            if (bookResult.error) {
+                bookResultSection.innerHTML = `<div class="alert alert-danger">${bookResult.error}</div>`;
+            } else {
+                const book = bookResult.book;
+                const bookHtml = `
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">${book.name}</h5>
+                            <p class="card-text">Author: ${book.author}</p>
+                            <p class="card-text">Year Published: ${book.year_published}</p>
+                            <p class="card-text">Book Type: ${book.book_type}</p>
+                        </div>
+                    </div>
+                `;
+                bookResultSection.innerHTML = bookHtml;
+            }
+        }
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

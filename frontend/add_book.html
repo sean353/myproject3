@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Book Form</title>
+    <!-- Add Bootstrap stylesheet link -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+</head>
+
+<body>
+
+    <div class="container mt-5">
+        <h1 class="mb-4">Library Management System</h1>
+
+        <div class="btn-group-vertical">
+
+            <a href="/frontend/home.html" class="btn btn-primary"  onclick="displayAllBooks()">Home page</a>
+            <a href="/frontend/list_book.html" class="btn btn-primary"  onclick="displayAllBooks()">Display All Books</a>
+            <a href="/frontend/customer_list.html" class="btn btn-primary" onclick="displayAllCustomers()">Display All Customers</a>
+            <a href="/frontend/loans_list.html" class="btn btn-primary" onclick="displayAllLoans()">Display All Loans</a>
+            <a href="/frontend/late_loans.html" class="btn btn-warning" onclick="displayLateLoans()">Display Late Loans</a>
+            <a href="/frontend/find_book.html" class="btn btn-info" onclick="findBookByName()">Find Book by Name</a>
+            <a href="/frontend/find_customer.html" class="btn btn-info" onclick="findCustomerByName()">Find Customer by Name</a>
+        </div>
+    </div>
+
+
+    <div class="container mt-5">
+        <h1>Add a Book</h1>
+        <form id="addBookForm">
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="author">Author:</label>
+                <input type="text" class="form-control" id="author" name="author" required>
+            </div>
+
+            <div class="form-group">
+                <label for="year_published">Year Published:</label>
+                <input type="text" class="form-control" id="year_published" name="year_published" required>
+            </div>
+
+            <div class="form-group">
+                <label for="book_type">Book Type:</label>
+                <input type="text" class="form-control" id="book_type" name="book_type" required>
+                <small id="bookTypeError" class="form-text text-danger"></small>
+            </div>
+
+            <!-- Display the maximum loan duration -->
+            <div class="form-group">
+                <label for="max_loan_duration">Max Loan Duration:</label>
+                <span id="max_loan_duration"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary" onclick="addBook()">Add Book</button>
+        </form>
+    </div>
+
+    <!-- Add Bootstrap scripts (jQuery and Popper.js) -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <!-- Add Bootstrap script -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+    <!-- Add Axios library -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+    <script>
+        const MY_SERVER = "http://127.0.0.1:5000";
+
+        document.getElementById('addBookForm').addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            addBook(); // Call the addBook function when the form is submitted
+        });
+
+
+
+        function addBook() {
+            var name = document.getElementById('name').value;
+            var author = document.getElementById('author').value;
+            var yearPublished = document.getElementById('year_published').value;
+            var bookType = document.getElementById('book_type').value;
+
+            // Validate book type
+            if (!isValidBookType(bookType)) {
+                document.getElementById('bookTypeError').innerText = 'Invalid book type. Please choose 1, 2, or 3.';
+                return;
+            }
+
+            // Clear previous error message
+            document.getElementById('bookTypeError').innerText = '';
+
+            var data = {
+                "name": name,
+                "author": author,
+                "year_published": yearPublished,
+                "book_type": bookType
+            };
+
+            // Use Axios for the POST request
+            axios.post(`${MY_SERVER}/addbook`, data)
+                .then(response => {
+                    Toastify({
+                        text: response.data.message,
+                        duration: 7000000,
+                        close: true,
+                        gravity: "top",
+                        position: "right",
+                        style: {
+                            background: "green"
+                        },
+                        onClose: function () {
+                            document.getElementById('max_loan_duration').innerText = `Max Loan Duration: ${response.data.max_loan_duration} days`;
+                        }
+                    }).showToast();
+
+                    document.getElementById('max_loan_duration').innerText = `Max Loan Duration: ${response.data.max_loan_duration} days`;
+                    // Optionally, you can redirect or perform other actions after adding the book.
+
+
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+        function isValidBookType(bookType) {
+            const validBookTypes = ['1', '2', '3'];
+            return validBookTypes.includes(bookType);
+        }
+    </script>
+</body>
+
+</html>
