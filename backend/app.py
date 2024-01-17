@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, request, jsonify
 from datetime import datetime as dt
 from flask_jwt_extended import JWTManager , create_access_token
+from icecream import ic 
 import datetime 
 import json,time,os
 from functools import wraps
@@ -14,6 +15,8 @@ import jwt
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager, create_access_token, get_jwt_identity, jwt_required
 app = Flask(__name__)
+
+# configure the SQLite database, relative to the app instance folder
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///books.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['JWT_SECRET_KEY'] = '123'  # Replace with your actual secret key
@@ -35,40 +38,48 @@ class Book(db.Model):
     author = db.Column(db.String(45), nullable=False)
     year_published = db.Column(db.String(45), nullable=False)
     book_type = db.Column(db.String(100), nullable=False)
+    loans= db.relationship("Loan",backref="books", cascade="all, delete-orphan")
 
    
 
 class Customer(db.Model):
     __tablename__ = 'customers'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(45), nullable=False, unique=True)
+    password = db.Column(db.String(45), nullable=False)
+    role = db.Column(db.String(45), nullable=False, default='user')  # Assuming 'user' is the default role
     name = db.Column(db.String(45), nullable=False)
     city = db.Column(db.String(45), nullable=False)
-    age = db.Column(db.String(45), nullable=False)
+    age = db.Column(db.Integer, nullable=False)
+    loans= db.relationship("Loan",backref="customers", cascade="all, delete-orphan")
+    
+    
 
 class Loan(db.Model):
     __tablename__ = 'loans'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id = db.Column(db.Integer, primary_key=True,)
     loan_date = db.Column(db.String(45), nullable=False)
     return_date = db.Column(db.String(45), nullable=False)
+  
+    
     
     # Foreign keys referencing Customer and Book
     customer_id = db.Column(db.Integer, db.ForeignKey('customers.id'), nullable=False)
     book_id = db.Column(db.Integer, db.ForeignKey('books.id'), nullable=False)
     
-    # Relationships
-    customer = db.relationship('Customer', backref='loans')
-    book = db.relationship('Book', backref='loans')
+   
+   
 
 
 
-class Users(db.Model):
-    __tablename__ = 'Users'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    username = db.Column(db.String(45), nullable=False, unique=True)
-    password = db.Column(db.String(45), nullable=False)
-    role = db.Column(db.String(45), nullable=False, default='user')  # Assuming 'user' is the default role
-
-
+# class Users(db.Model):
+#     __tablename__ = 'Users'
+#     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+#     username = db.Column(db.String(45), nullable=False, unique=True)
+#     password = db.Column(db.String(45), nullable=False)
+#     role = db.Column(db.String(45), nullable=False, default='user')  # Assuming 'user' is the default role
+#     customer_id = db.Column(db.Integer, db.ForeignKey('customers.id'), nullable=False)
+#     customer = db.relationship('Customer', backref='users')
     
 
 
@@ -135,51 +146,67 @@ def logout():
         return jsonify({'error': 'Internal Server Error'}), 500
 
 
-@app.route('/signup', methods=['POST'])
-def signup():
-    request_data = request.get_json()
-    print(request_data)
-    username = request_data['username']
-    password = request_data['password']
-    role = request_data['role']
+# @app.route('/signup', methods=['POST'])
+# def signup():
+#     request_data = request.get_json()
+#     print(request_data)
+#     username = request_data['username']
+#     password = request_data['password']
+#     role = request_data['role']
+#     username = request_data['username']
+#     username = request_data['username']
+#     customer_name = request_data['customer_name']
+    
+#     customer= Customer.query.filter_by(name=customer_name).first()
+#     if customer: 
 
-    # Check if the username is already taken
-    existing_user = Users.query.filter_by(username=username).first()
-    if existing_user:
-        return jsonify({'message': 'Username is already taken'}), 400
+#     # Check if the username is already taken
+#         existing_user = Users.query.filter_by(username=username).first()
+#         if existing_user:
+#             return jsonify({'message': 'Username is already taken'}), 400
 
-    # Hash and salt the password using Bcrypt
-    hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+#         # Hash and salt the password using Bcrypt
+#         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
 
-    # Create a new user and add to the database
-    new_user = Users(username=username, password=hashed_password, role=role)
-    db.session.add(new_user)
-    db.session.commit()
+#         # Create a new user and add to the database
+#         new_user = Users(username=username, password=hashed_password, role=role, customer_id = customer.id)
+#         ic(type(new_user))
+#         db.session.add(new_user)
+#         db.session.commit()
 
-    # Customize the response message based on the role
-    if role == 'admin':
-        return jsonify({'message': 'Admin created successfully'}), 201
-    else:
-        return jsonify({'message': 'User created successfully'}), 201
+#     # Customize the response message based on the role
+#         if role == 'admin':
+#             return jsonify({'message': 'Admin created successfully'}), 201
+#         else:
+#             return jsonify({'message': 'User created successfully'}), 201
+#     return jsonify({'message': 'ni customer'}), 201
+
+
+
 
 
 
 
 @app.route('/login', methods=['POST'])
 def login():
-    data = request.get_json()
-    username = data["username"]
-    password = data["password"]
+    try:
+        data = request.get_json()
+        username = data["username"]
+        password = data["password"]
 
-    # Check if the user exists
-    user = Users.query.filter_by(username=username).first()
+        # Check if the user exists
+        user = Customer.query.filter_by(username=username).first()
 
-    if user and bcrypt.check_password_hash(user.password, password):
-        # Check if the provided role matches the user's current role
-        if 'role' in data and data['role'] != user.role:
-            return jsonify({'message': 'Invalid role for this user'}), 401
+        if not user or not bcrypt.check_password_hash(user.password, password):
+            return jsonify({'message': 'Invalid username or password'}), 401
 
-        # Generate an access token with an expiration time
+            # # Check if the provided role matches the user's current role
+            # if 'role' in data and data['role'] != user.role:
+            #     return jsonify({'message': 'Invalid role for this user'}), 401
+            
+            # ic("==========================================")
+
+            # Generate an access token with an expiration time
         expires = datetime.timedelta(hours=1)
 
         if user.role == 'admin':
@@ -191,8 +218,25 @@ def login():
 
         # Include the username and role in the response
         return jsonify({'access_token': access_token, 'username': user.username, 'role': user.role}), 200
-    else:
-        return jsonify({'message': 'Invalid username or password'}), 401
+
+    except Exception as e:
+        print("Login error:", str(e))
+        return jsonify({'message': 'Internal Server Error'}), 500
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -200,12 +244,15 @@ def login():
 @app.route('/addcustomer', methods=['POST'])
 def add_customer():
     data = request.get_json()
-
     name = data.get('name')
+    username = data.get('username')
+    password = data.get('password')
+    hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+    role = data.get('role')
     city = data.get('city')
     age = data.get('age')
 
-    new_customer = Customer(name=name, city=city, age=age)
+    new_customer = Customer(name=name, city=city, age=age,username=username,password=hashed_password,role=role)
 
     db.session.add(new_customer)
     db.session.commit()
@@ -213,16 +260,17 @@ def add_customer():
     return jsonify({'message': 'Customer added successfully'})
 
 @app.route('/addloan', methods=['POST'])
+@jwt_required() 
 def add_loan():
     try:
         data = request.get_json()
 
         # Get customer and book names from the request data
-        customer_name = data.get('customer_name')
+        customer_name = get_jwt_identity()
         book_name = data.get('book_name')
 
         # Query customer and book by their names
-        customer = Customer.query.filter_by(name=customer_name).first()
+        customer = Customer.query.filter_by(id=customer_name).first()
         book = Book.query.filter_by(name=book_name).first()
 
         # Check if the customer and book exist
@@ -244,8 +292,10 @@ def add_loan():
 
 
 @app.route('/addbook', methods=['POST'])
+@jwt_required() 
 def add_book():
     data = request.get_json()
+    print(data)
 
     name = data.get('name')
     author = data.get('author')
@@ -293,20 +343,24 @@ def list_loans():
 
 
 @app.route('/listcustomers', methods=['GET'])
+@jwt_required() 
 def list_customers():
     # Query all customers from the database
     customers = Customer.query.all()
-
+    customer_list =[]
     # Create a list of dictionaries containing customer information
-    customer_list = [
-        {
-            'id': customer.id,
-            'name': customer.name,
-            'city': customer.city,
-            'age': customer.age
-        }
-        for customer in customers
-    ]
+    for customer in customers:
+        if customer.role == "user":
+            customer_list.append({
+                "name" :customer.name,
+                "role" :customer.role,
+                "city" :customer.city,
+                "age" :customer.age
+                
+            })
+    ic("zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz")
+    ic(customer_list)
+
 
     # Return the list of customers as JSON
     return jsonify({'customers': customer_list})
@@ -314,6 +368,7 @@ def list_customers():
 
 
 @app.route('/listbooks', methods=['GET'])
+@jwt_required() 
 def list_books():
     # Query all books from the database
     books = Book.query.all()
@@ -334,6 +389,7 @@ def list_books():
     return jsonify({'books': book_list})
 
 @app.route('/findbook/<string:book_name>', methods=['GET'])
+@jwt_required() 
 def find_book(book_name):
     # Query the book by name
     book = Book.query.filter_by(name=book_name).first()
@@ -353,6 +409,7 @@ def find_book(book_name):
 
 
 @app.route('/findcustomer/<string:customer_name>', methods=['GET'])
+@jwt_required() 
 def find_customer(customer_name):
     # Query the customer by name
     customer = Customer.query.filter_by(name=customer_name).first()
@@ -369,36 +426,67 @@ def find_customer(customer_name):
         'age': customer.age
     }})
 
+
 @app.route('/returnbook/<string:book_name>', methods=['POST'])
+@jwt_required()  # Requires a valid access token
 def return_book_by_name(book_name):
     try:
+        current_user = get_jwt_identity()
+        print(current_user)
+        # Find the user by username
+        user = Users.query.filter_by(id=current_user).first()
+        # return jsonify({'error': 'User not found'}), 200
+        # Check if the user exists
+        print(user)
+        if not user:
+            print("nnnnnnnnnuser")
+            return jsonify({'error': 'User not found'})
+        print("gggggggggggggggggggggggggggggggggggggggggggggggggg")
         # Find the book by name
+        print("aaaa")
         book = Book.query.filter_by(name=book_name).first()
-
+        print("bbbb")
+        print(book)
         # Check if the book exists
         if not book:
-            return jsonify({'error': 'Book not found'}), 404
+            print("aaaaa")
+            return jsonify({'error': 'Book not found'})
 
-        # Find the latest loan for the book
-        latest_loan = Loan.query.filter_by(book_id=book.id).order_by(Loan.id.desc()).first()
-
+        # Find the latest loan for the book and the current user
+        latest_loan = Loan.query.filter_by(book_id=book.id, customer_id=user.id).order_by(Loan.id.desc()).all()
         # Check if there's an active loan for the book
-        if not latest_loan or latest_loan.return_date:
-            return jsonify({'error': 'No active loan for the book'}), 404
+        if  len(latest_loan)== 0  :
+            return jsonify({'error': 'No active loan for the book'})
 
         # Update return_date for the loan
-        latest_loan.return_date = datetime.now().strftime('%Y-%m-%d')
+        for loan in latest_loan:
+            if loan.return_date == None:
+                loan.return_date = dt.now()
+
+        ic(latest_loan)
         db.session.commit()
+            #Fetch the updated list of user books
+        ##user_books = Book.query.join(Loan, Book.id == Loan.book_id).filter_by(user_id=user.id, return_date=None).all()
 
-        return jsonify({'message': 'Book returned successfully'})
-
+        # Return the list of user books along with details of the returned book
+        return jsonify({
+            'message': 'Book returned successfully',
+            'returned_book': {
+                'name': book.name,
+                'author': book.author,
+                'year_published': book.year_published,
+                'book_type': book.book_type
+            }
+        })
+# ,
+            # 'user_books': [{'name': b.name, 'author': b.author, 'year_published': b.year_published, 'book_type': b.book_type} for b in user_books]
     except Exception as e:
         print(str(e))
         return jsonify({'error': 'Internal Server Error'}), 500
-    
 
 
 @app.route('/lateloans', methods=['GET'])
+@jwt_required() 
 def list_late_loans():
     # Query late loans from the database (loans with a return_date earlier than today)
     today = datetime.now().strftime('%Y-%m-%d')
@@ -422,6 +510,7 @@ def list_late_loans():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
+    
     app.run(debug=True)
 
     

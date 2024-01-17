@@ -1,24 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Return Book</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
+
 <body>
 
-    <div class="btn-group-vertical">
-        <a href="/frontend/home.html" class="btn btn-primary"  onclick="displayAllBooks()">Home page</a>   
-        <a href="/frontend/list_book.html" class="btn btn-primary"  onclick="displayAllBooks()">Display All Books</a>
-        <a href="/frontend/customer_list.html" class="btn btn-primary" onclick="displayAllCustomers()">Display All Customers</a>
-        <a href="/frontend/loans_list.html" class="btn btn-primary" onclick="displayAllLoans()">Display All Loans</a>
-        <a href="/frontend/late_loans.html" class="btn btn-warning" onclick="displayLateLoans()">Display Late Loans</a>
-        <a href="/frontend/find_book.html" class="btn btn-info" onclick="findBookByName()">Find Book by Name</a>
-        <a href="/frontend/find_customer.html" class="btn btn-info" onclick="findCustomerByName()">Find Customer by Name</a>
-    </div>
-</div>
     <div class="container mt-5">
         <h1 class="mb-4">Return Book</h1>
 
@@ -31,28 +22,67 @@
         </form>
 
         <div id="resultSection"></div>
+        <div id="userBooksSection"></div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
-        const MY_SERVER = 'http://127.0.0.1:5000'; // Replace with your actual Flask server URL
+        const MY_SERVER = 'http://127.0.0.1:5000';
 
         function returnBook() {
-            const bookName = document.getElementById('bookName').value;
+            // Retrieve the access token
+            const accessToken = sessionStorage.getItem('access_token');
 
-            axios.post(`${MY_SERVER}/returnbook/${bookName}`)
+            // Check if the access token is available
+            if (!accessToken) {
+                console.error('Access token not found.');
+                // Handle the case where the access token is not available, maybe redirect to the login page
+                return;
+            }
+
+            const bookName = document.getElementById('bookName').value;
+            
+
+            axios.post(`${MY_SERVER}/returnbook/${bookName}`, {}, {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`
+                }
+            })
                 .then(response => displayResult(response.data))
                 .catch(error => displayResult({ error: error.message }));
         }
 
+
+
+
+
+
+
+
+
+
+
+
         function displayResult(result) {
             const resultSection = document.getElementById('resultSection');
+            const userBooksSection = document.getElementById('userBooksSection');
             resultSection.innerHTML = '';
+            userBooksSection.innerHTML = '';
 
             if (result.error) {
                 resultSection.innerHTML = `<div class="alert alert-danger">${result.error}</div>`;
             } else {
                 resultSection.innerHTML = `<div class="alert alert-success">${result.message}</div>`;
+
+                // Display the list of user books
+                if (result.user_books && result.user_books.length > 0) {
+                    userBooksSection.innerHTML = '<h3>Your Books:</h3>';
+                    userBooksSection.innerHTML += '<ul>';
+                    result.user_books.forEach(book => {
+                        userBooksSection.innerHTML += `<li>${book.name} - ${book.author} - ${book.year_published}</li>`;
+                    });
+                    userBooksSection.innerHTML += '</ul>';
+                }
             }
         }
     </script>
@@ -61,4 +91,5 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
+
 </html>

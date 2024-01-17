@@ -63,14 +63,15 @@
                                 <label for="password">Password</label>
                                 <input type="password" class="form-control" id="password" name="password" required>
                             </div>
-                            <div class="form-group">
+                            <!-- <div class="form-group">
                                 <label for="role">Role</label>
                                 <select class="form-control" id="role" name="role" required>
-                                    <option value="user">User</option>
-                                    <option value="admin">Admin</option>
+                                    <option value="0">User</option>
+                                    <option value="1">Admin</option>
                                 </select>
-                            </div>
+                            </div> -->
                             <button type="button" class="btn btn-primary btn-block" onclick="login()">Login</button>
+                            <a href="add_customer.html"><button type="button" class="btn btn-primary btn-block">register</button></a>
                         </form>
                     </div>
                 </div>
@@ -94,16 +95,16 @@
         const MY_SERVER = "http://127.0.0.1:5000";
 
         const login = async () => {
+
             try {
                 const response = await axios.post(`${MY_SERVER}/login`, {
                     username: username.value,
-                    password: password.value,
-                    role: role.value
+                    password: password.value
                 });
 
                 const accessToken = response.data.access_token;
                 const loggedInUsername = response.data.username;
-                const userRole = role.value;
+                const userRole = response.data.role;
 
                 // Save the access token and role in sessionStorage
                 sessionStorage.setItem("access_token", accessToken);
@@ -126,7 +127,9 @@
                 console.log("heyyyyyyyyyyyy");
 
                 // Redirect based on the user's role
-                if (userRole === 'admin') {
+                console.log("role is: " + userRole);
+                if (userRole === 'admin')
+             {
                     window.location.href = "/frontend/menu.html";
                 } else {
                     window.location.href = "/frontend/home_user.html";
@@ -140,6 +143,10 @@
                 }).showToast();
             }
         };
+       
+    
+    
+    
     </script>
 
 </body>
