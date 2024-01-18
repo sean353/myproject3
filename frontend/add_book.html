@@ -62,7 +62,7 @@
                 </select>
             </div>
 
-            <button type="button" class="btn btn-primary" onclick="addBook()">Add Book</button>
+            <button type="submit" class="btn btn-primary" onclick="addBook()">Add Book</button>
         </form>
     </div>
 
@@ -80,57 +80,60 @@
 
     <script>
         const MY_SERVER = "http://127.0.0.1:5000";
-        function addBook() {
-            var name = document.getElementById('name').value;
-            var author = document.getElementById('author').value;
-            var yearPublished = document.getElementById('year_published').value;
-            var bookType = document.getElementById('book_type').value;
 
-            // Clear previous error message
-            document.getElementById('bookTypeError').innerText = '';
+// Initialize Toastify
+Toastify({
+    text: "koren",
+    duration: 2000, // Set a short duration for initialization
+    newWindow: true,
+    close: true,
+    gravity: "top", // Set the toast position
+    position: "right",
+    style: {
+        background: "green"
+    },
+}).showToast();
 
-            var data = {
-                "name": name,
-                "author": author,
-                "year_published": yearPublished,
-                "book_type": bookType
-            };
+function addBook() {
+    var name = document.getElementById('name').value;
+    var author = document.getElementById('author').value;
+    var yearPublished = document.getElementById('year_published').value;
+    var bookType = document.getElementById('book_type').value;
 
-            // Use Axios for the POST request
-            sessionStorage.getItem("access_token")
-            axios.post(`${MY_SERVER}/addbook`, data,
-                    {headers: {
-                        Authorization: `Bearer ${token}`},
-                    },)
-                .then(response => {
-                    Toastify({
-                        text: response.data.message,
-                        duration: 7000000,
-                        close: true,
-                        gravity: "top",
-                        position: "right",
-                        style: {
-                            background: "green"
-                        },
-                        onClose: function () {
-                            document.getElementById('max_loan_duration').innerText = `Max Loan Duration: ${response.data.max_loan_duration} days`;
-                        }
-                    }).showToast();
+    // Clear previous error message
+    var data = {
+        "name": name,
+        "author": author,
+        "year_published": yearPublished,
+        "book_type": bookType
+    };
 
-                    document.getElementById('max_loan_duration').innerText = `Max Loan Duration: ${response.data.max_loan_duration} days`;
-                    // Optionally, you can redirect or perform other actions after adding the book.
-
-
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
-        }
-
-        function isValidBookType(bookType) {
-            const validBookTypes = ['1', '2', '3'];
-            return validBookTypes.includes(bookType);
-        }
+    // Use Axios for the POST request
+    const token = sessionStorage.getItem("access_token")
+    axios.post(`${MY_SERVER}/addbook`, data,
+        {
+            headers: {
+                Authorization: `Bearer ${token}`
+            },
+        },)
+        .then(response => {
+            console.log(response);
+            Toastify({
+                text: "Book added successfully",
+                duration: 5000,
+                close: true,
+                gravity: "top",
+                position: "right",
+                style: {
+                    background: "green"
+                },
+            }).showToast();
+            console.log("sdsaddadsadadsadasdd");
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+}
     </script>
 </body>
 

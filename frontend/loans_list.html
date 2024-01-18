@@ -23,7 +23,7 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>ID</th>
+                    
                     <th>Loan Date</th>
                     <th>Return Date</th>
                     <th>customer name</th>
@@ -54,7 +54,14 @@
         });
 
         function fetchLoanList() {
-            axios.get(`${MY_SERVER}/listloans`)
+            const token = sessionStorage.getItem("access_token")
+            axios.get(`${MY_SERVER}/listloans`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                })
+            
                 .then(response => {
                     const loanList = response.data.loans;
                     displayLoanList(loanList);
@@ -74,7 +81,7 @@
         loanList.forEach(loan => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${loan.id}</td>
+                
                 <td>${loan.loan_date}</td>
                 <td>${loan.return_date}</td>
                 <td>${loan.customer_name}</td>

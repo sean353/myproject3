@@ -257,20 +257,25 @@ def add_customer():
     db.session.add(new_customer)
     db.session.commit()
 
-    return jsonify({'message': 'Customer added successfully'})
 
+    
+    if role.lower() == 'admin':
+        return jsonify({'message': 'Admin added successfully'})
+    else:
+        return jsonify({'message': 'Customer added successfully'})
+    
 @app.route('/addloan', methods=['POST'])
 @jwt_required() 
 def add_loan():
     try:
         data = request.get_json()
 
-        # Get customer and book names from the request data
-        customer_name = get_jwt_identity()
+        # Get customer ID and book name from the request data
+        customer_id = get_jwt_identity()
         book_name = data.get('book_name')
 
-        # Query customer and book by their names
-        customer = Customer.query.filter_by(id=customer_name).first()
+        # Query customer by ID and book by name
+        customer = Customer.query.filter_by(id=customer_id).first()
         book = Book.query.filter_by(name=book_name).first()
 
         # Check if the customer and book exist
@@ -278,7 +283,12 @@ def add_loan():
             return jsonify({'error': 'Customer or book not found'}), 404
 
         # Create a new loan associated with the customer and book
-        new_loan = Loan(loan_date=dt.now().strftime('%Y-%m-%d'), return_date='', customer=customer, book=book)
+        new_loan = Loan(
+            loan_date=dt.now().strftime('%Y-%m-%d'),
+            return_date=dt.now().strftime('%Y-%m-%d'),
+            customer_id=customer.id,  # Use the customer_id foreign key
+            book_id=book.id  # Use the book_id foreign key
+        )
 
         db.session.add(new_loan)
         db.session.commit()
@@ -319,7 +329,6 @@ def add_book():
 
 
 
-
 @app.route('/listloans', methods=['GET'])
 def list_loans():
     # Query all loans from the database with related customer and book information
@@ -328,11 +337,11 @@ def list_loans():
     # Create a list of dictionaries containing loan information, customer name, and book name
     loan_list = [
         {
-            'id': loan.id,
+            
             'loan_date': loan.loan_date,
             'return_date': loan.return_date,
-            'customer_name': loan.customer.name,
-            'book_name': loan.book.name
+            'customer_name': loan.customers.name,  # Use the 'name' attribute of the Customer model
+            'book_name': loan.books.name  # Use the 'name' attribute of the Book model
         }
         for loan in loans
     ]
@@ -434,7 +443,7 @@ def return_book_by_name(book_name):
         current_user = get_jwt_identity()
         print(current_user)
         # Find the user by username
-        user = Users.query.filter_by(id=current_user).first()
+        user = Customer.query.filter_by(id=current_user).first()
         # return jsonify({'error': 'User not found'}), 200
         # Check if the user exists
         print(user)
@@ -457,13 +466,18 @@ def return_book_by_name(book_name):
         # Check if there's an active loan for the book
         if  len(latest_loan)== 0  :
             return jsonify({'error': 'No active loan for the book'})
+        
 
         # Update return_date for the loan
+        ic()
         for loan in latest_loan:
-            if loan.return_date == None:
-                loan.return_date = dt.now()
-
+            
+            if loan.return_date == "":
+                loan.return_date = dt.now().strftime('%Y-%m-%d') 
+            
         ic(latest_loan)
+        print(db.session.dirty)
+        print(db.session.new)
         db.session.commit()
             #Fetch the updated list of user books
         ##user_books = Book.query.join(Loan, Book.id == Loan.book_id).filter_by(user_id=user.id, return_date=None).all()

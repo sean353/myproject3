@@ -19,9 +19,8 @@
         <form id="findBookForm">
             <div class="form-group">
                 <label for="searchBookName">Select Book:</label>
-                <select class="form-control" id="bookDropdown">
-                    <!-- Books will be dynamically populated here -->
-                </select>
+                <input type="text" class="form-control" id="searchBookName" placeholder="Enter Book Name"
+                required>
             </div>
             <button type="button" class="btn btn-primary" onclick="findBookByName()">Find Book</button>
         </form>
@@ -50,9 +49,16 @@
         }
 
         function findBookByName() {
-            const selectedBook = document.getElementById('bookDropdown').value;
+            const selectedBook = document.getElementById('searchBookName').value;
 
-            axios.get(`${MY_SERVER}/findbook/${selectedBook}`)
+            const token = sessionStorage.getItem("access_token")
+
+            axios.get(`${MY_SERVER}/findbook/${selectedBook}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                })
                 .then(response => displayBookResult(response.data))
                 .catch(error => displayBookResult({ error: error.message }));
         }

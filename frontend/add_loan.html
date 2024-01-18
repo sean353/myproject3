@@ -75,8 +75,11 @@
 
             // Fetch the list of books and populate the dropdown
             async function fetchBooks() {
-                try {
-                    const response = await axios.get(`${MY_SERVER}/listbooks`);
+                try {  const token = sessionStorage.getItem("access_token")
+                    const response = await axios.get(`${MY_SERVER}/listbooks`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,}
+                    },);
                     const books = response.data.books;
 
                     const bookDropdown = document.getElementById("bookName");
@@ -111,7 +114,7 @@
 
             // Call fetchBooks and fetchCustomers when the page loads
             fetchBooks();
-            fetchCustomers();
+            // fetchCustomers();
 
             function addLoan() {
                 var form = document.getElementById("addLoanForm");
