@@ -7,6 +7,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Find Customer by Name</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <link rel="icon" type="image/x-icon" href="/static/favicon.jpg">
+
+
 </head>
 
 <body>
@@ -40,44 +44,68 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script>
-        const MY_SERVER = 'http://127.0.0.1:5000'; // Replace with your actual Flask server URL
+         const MY_SERVER = 'http://127.0.0.1:5000'; // Replace with your actual Flask server URL
 
-        function findCustomerByName() {
-            const customerName = document.getElementById('searchCustomerName').value;
+function findCustomerByName() {
+    const customerName = document.getElementById('searchCustomerName').value;
 
-            const token = sessionStorage.getItem("access_token")
+    const token = sessionStorage.getItem("access_token")
 
-            axios.get(`${MY_SERVER}/findcustomer/${customerName}`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                })
-                .then(response => displayCustomerResult(response.data))
-                .catch(error => displayCustomerResult({ error: error.message }));
-        }
+    axios.get(`${MY_SERVER}/findcustomer/${customerName}`,
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        })
+        .then(response => displayCustomerResult(response.data))
+        .catch(error => { Toastify({
+        text: "customer is not found",
+        duration: 2500,
+        close: true,
+        gravity: "top",
+        position: "right",
+        style: {
+            background:'red'
+        },
+    }).showToast();
+            
+        });
+}
 
-        function displayCustomerResult(customerResult) {
-            const customerResultSection = document.getElementById('customerResultSection');
-            customerResultSection.innerHTML = '';
+function displayCustomerResult(customerResult) {
+    const customerResultSection = document.getElementById('customerResultSection');
+    customerResultSection.innerHTML = '';
 
-            if (customerResult.error) {
-                customerResultSection.innerHTML = `<div class="alert alert-danger">${customerResult.error}</div>`;
-            } else {
-                const customer = customerResult.customer;
-                const customerHtml = `
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">${customer.name}</h5>
-                            <p class="card-text">City: ${customer.city}</p>
-                            <p class="card-text">Age: ${customer.age}</p>
-                        </div>
-                    </div>
-                `;
-                customerResultSection.innerHTML = customerHtml;
-            }
-        }
+    if (customerResult.error) {
+        Toastify({
+        text: "customer is not found",
+        duration: 5000,
+        close: true,
+        gravity: "top",
+        position: "right",
+        style: {
+            background: 'red'
+        },
+    }).showToast();
+    } else {
+        const customer = customerResult.customer;
+        const customerHtml = `
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">${customer.name}</h5>
+                    <p class="card-text">City: ${customer.city}</p>
+                    <p class="card-text">Age: ${customer.age}</p>
+                </div>
+            </div>
+        `;
+        customerResultSection.innerHTML = customerHtml;
+    }
+}
+
+
+
     </script>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

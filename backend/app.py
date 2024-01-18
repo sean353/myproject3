@@ -14,6 +14,7 @@ from flask_cors import CORS, cross_origin
 import jwt
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager, create_access_token, get_jwt_identity, jwt_required
+
 app = Flask(__name__)
 
 # configure the SQLite database, relative to the app instance folder
@@ -281,11 +282,17 @@ def add_loan():
         # Check if the customer and book exist
         if not customer or not book:
             return jsonify({'error': 'Customer or book not found'}), 404
+        
+         # Check if the customer has already borrowed the book
+        existing_loan = Loan.query.filter_by(customer_id=customer.id, book_id=book.id).first()
+        if existing_loan:
+            return jsonify({'error': 'Customer has already borrowed this book'}), 400
+
 
         # Create a new loan associated with the customer and book
         new_loan = Loan(
             loan_date=dt.now().strftime('%Y-%m-%d'),
-            return_date=dt.now().strftime('%Y-%m-%d'),
+            return_date="",
             customer_id=customer.id,  # Use the customer_id foreign key
             book_id=book.id  # Use the book_id foreign key
         )
@@ -405,7 +412,7 @@ def find_book(book_name):
 
     # Check if the book exists
     if not book:
-        return jsonify({'error': 'Book not found'}), 404
+        return jsonify({'error': 'Book not found'})
 
     # Return book information as JSON
     return jsonify({'book': {
@@ -425,7 +432,7 @@ def find_customer(customer_name):
 
     # Check if the customer exists
     if not customer:
-        return jsonify({'error': 'Customer not found'}), 404
+        return jsonify({'error': 'Customer not found'})
 
     # Return customer information as JSON
     return jsonify({'customer': {

@@ -8,11 +8,14 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <link rel="icon" type="image/x-icon" href="/static/favicon.jpg">
 
     <!-- Custom Styles -->
     <style>
         body {
-            background-color: #f8f9fa;
+            background-color: #000;
+            color: #fff;
         }
 
         .container {
@@ -70,8 +73,8 @@
                                     <option value="1">Admin</option>
                                 </select>
                             </div> -->
-                            <button type="button" class="btn btn-primary btn-block" onclick="login()">Login</button>
-                            <a href="add_customer.html"><button type="button" class="btn btn-primary btn-block">register</button></a>
+                            <button type="button" class="btn btn-primary btn-block" onclick="login()">Login</button><br>
+                            <a href="add_customer.html"><button type="button" class="btn btn-primary btn-block">Register</button></a>
                         </form>
                     </div>
                 </div>
@@ -88,14 +91,12 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
     <!-- Toastify JS -->
-   
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
     <script>
         const MY_SERVER = "http://127.0.0.1:5000";
 
         const login = async () => {
-
             try {
                 const response = await axios.post(`${MY_SERVER}/login`, {
                     username: username.value,
@@ -109,27 +110,21 @@
                 // Save the access token and role in sessionStorage
                 sessionStorage.setItem("access_token", accessToken);
                 sessionStorage.setItem("role", userRole);
-                console.log("heyyyyyyyyyyyyy");
 
                 // Display welcome message with Toastify
                 Toastify({
                     text: `Hey ${loggedInUsername}! Welcome back as a ${userRole}.`,
-                    duration: 7000000,
-                        close: true,
-                        gravity: "top",
-                        position: "right",
-                        style: {
-                            background: "green"
-                        },
-                    
-                   
+                    duration: 4000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    style: {
+                        background: "green"
+                    },
                 }).showToast();
-                console.log("heyyyyyyyyyyyy");
 
                 // Redirect based on the user's role
-                console.log("role is: " + userRole);
-                if (userRole === 'admin')
-             {
+                if (userRole === 'admin') {
                     window.location.href = "/frontend/menu.html";
                 } else {
                     window.location.href = "/frontend/home_user.html";
@@ -143,10 +138,6 @@
                 }).showToast();
             }
         };
-       
-    
-    
-    
     </script>
 
 </body>

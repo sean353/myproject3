@@ -7,6 +7,9 @@
     <title>Add Loan</title>
     <!-- Bootstrap CSS link (make sure to include Bootstrap in your project) -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <link rel="icon" type="image/x-icon" href="/static/favicon.jpg">
+
     <!-- Custom CSS for styling -->
     <style>
         body {
@@ -43,6 +46,9 @@
     <div class="container mt-5">
         <h1 class="mb-4">Library Management System</h1>
 
+
+        
+
         <div class="container mt-5">
             <h1>Add Loan</h1>
             <form id="addLoanForm" method="post">
@@ -69,16 +75,20 @@
 
         <!-- Axios (make sure to include Axios in your project) -->
         <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
 
         <script>
             const MY_SERVER = "http://127.0.0.1:5000";
 
             // Fetch the list of books and populate the dropdown
             async function fetchBooks() {
-                try {  const token = sessionStorage.getItem("access_token")
+                try {
+                    const token = sessionStorage.getItem("access_token")
                     const response = await axios.get(`${MY_SERVER}/listbooks`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,}
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        }
                     },);
                     const books = response.data.books;
 
@@ -130,10 +140,28 @@
                     },
                 })
                     .then(response => {
-                        alert(response.data.message);
+                        Toastify({
+                            text: response.data.message,
+                            duration: 3000,
+                            close: true,
+                            gravity: "top",
+                            position: "right",
+                            style: {
+                                background: "green"
+                            },
+                        }).showToast();
                     })
                     .catch(error => {
-                        console.error('Error:', error);
+                        Toastify({
+                            text: "Book cant loand twice",
+                            duration: 3000,
+                            close: true,
+                            gravity: "top",
+                            position: "right",
+                            style: {
+                                background: "red"
+                            },
+                        }).showToast();
                     });
             }
         </script>

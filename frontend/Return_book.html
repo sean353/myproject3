@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Return Book</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <link rel="icon" type="image/x-icon" href="/static/favicon.jpg">
+
 </head>
 
 <body>
@@ -26,6 +29,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script> 
     <script>
         const MY_SERVER = 'http://127.0.0.1:5000';
 
@@ -41,7 +45,7 @@
             }
 
             const bookName = document.getElementById('bookName').value;
-            
+
 
             axios.post(`${MY_SERVER}/returnbook/${bookName}`, {}, {
                 headers: {
@@ -70,9 +74,28 @@
             userBooksSection.innerHTML = '';
 
             if (result.error) {
-                resultSection.innerHTML = `<div class="alert alert-danger">${result.error}</div>`;
+                Toastify({
+                    text: "Book is not found",
+                    duration: 5000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    style: {
+                        background: 'red'
+                    },
+                }).showToast();
             } else {
-                resultSection.innerHTML = `<div class="alert alert-success">${result.message}</div>`;
+                Toastify({
+                    text: "Book returned succesfully",
+                    duration: 5000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    style: {
+                        background: 'green'
+                    },
+                }).showToast();
+
 
                 // Display the list of user books
                 if (result.user_books && result.user_books.length > 0) {

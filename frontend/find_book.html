@@ -1,12 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Find Book by Name</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <link rel="icon" type="image/x-icon" href="/static/favicon.jpg">
+
+
 </head>
+
 <body>
     <div class="btn-group-vertical">
         <a href="/frontend/home.html" class="btn btn-primary" onclick="displayAllBooks()">Home page</a>
@@ -19,8 +25,7 @@
         <form id="findBookForm">
             <div class="form-group">
                 <label for="searchBookName">Select Book:</label>
-                <input type="text" class="form-control" id="searchBookName" placeholder="Enter Book Name"
-                required>
+                <input type="text" class="form-control" id="searchBookName" placeholder="Enter Book Name" required>
             </div>
             <button type="button" class="btn btn-primary" onclick="findBookByName()">Find Book</button>
         </form>
@@ -29,6 +34,8 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
     <script>
         const MY_SERVER = 'http://127.0.0.1:5000'; // Replace with your actual Flask server URL
 
@@ -68,7 +75,17 @@
             bookResultSection.innerHTML = '';
 
             if (bookResult.error) {
-                bookResultSection.innerHTML = `<div class="alert alert-danger">${bookResult.error}</div>`;
+                Toastify({
+                    text: "Book is not found",
+                    duration: 2500,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    style: {
+                        background: 'red'
+                    },
+                }).showToast();
+
             } else {
                 const book = bookResult.book;
                 const bookHtml = `
@@ -90,4 +107,5 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
+
 </html>

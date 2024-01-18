@@ -6,6 +6,8 @@
     <title>List of Loans</title>
     <!-- Add Bootstrap stylesheet link -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="icon" type="image/x-icon" href="/static/favicon.jpg">
+
 </head>
 <body>
     <div class="btn-group-vertical">
@@ -28,6 +30,7 @@
                     <th>Return Date</th>
                     <th>customer name</th>
                     <th>Book name</th>
+                    
                 </tr>
             </thead>
             <tbody id="loanListBody">
@@ -86,6 +89,8 @@
                 <td>${loan.return_date}</td>
                 <td>${loan.customer_name}</td>
                 <td>${loan.book_name}</td>
+                
+                
             `;
             loanListBody.appendChild(row);
         });

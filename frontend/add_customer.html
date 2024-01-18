@@ -6,14 +6,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Customer</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <link rel="icon" type="image/x-icon" href="/static/favicon.jpg">
+
+
+   
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            margin-top: 50px;
+        }
+
+        h1 {
+            color: #007bff;
+        }
+
+        form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        label {
+            margin-top: 10px;
+            display: block;
+        }
+
+        input,
+        select {
+            margin-bottom: 10px;
+        }
+
+        button {
+            margin-top: 20px;
+        }
+    </style>
 </head>
 
 <body>
-    <div class="container mt-5">
-        <h1 class="mb-4">Library Management System</h1>
+    <div class="container">
+        <h1>Library Management System</h1>
 
-        <div class="btn-group-vertical">
+        <div class="btn-group-vertical mt-3">
             <a href="/frontend/home.html" class="btn btn-primary" onclick="displayAllBooks()">Home page</a>
             <a href="/frontend/list_book.html" class="btn btn-primary" onclick="displayAllBooks()">Display All Books</a>
             <a href="/frontend/customer_list.html" class="btn btn-primary" onclick="displayAllCustomers()">Display All
@@ -27,43 +66,43 @@
                 Name</a>
         </div>
     </div>
-    <h1>Add Customer</h1>
-    <form id="addCustomerForm" method="post">
-        <label for="name">name:</label>
-        <input type="text" id="name" name="name" required>
-        <br>
-        <label for="username">username:</label>
-        <input type="text" id="username" name="username" required>
-        <br>
-        <label for="password">password:</label>
-        <input type="text" id="password" name="password" required>
-        <br>
 
-        <label for="role">role:</label>
-        <select name="role" id="role">
-            <option value="admin">admin</option>
-            <option value="user">user</option>
-        </select>
-        <br>
-        <label for="customerCity">Customer City:</label>
-        <input type="text" id="customerCity" name="city" required>
-        <br>
-        <label for="customerAge">Customer Age:</label>
-        <input type="text" id="customerAge" name="age" required>
-        <br>
-        <button type="button" class="btn btn-primary" onclick="addCustomer()">Add Customer</button>
-    </form>
+    <div class="container mt-5">
+        <h1>Add Customer</h1>
+        <form id="addCustomerForm" method="post">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" class="form-control" required>
 
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" class="form-control" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" class="form-control" required>
+
+            <label for="role">Role:</label>
+            <select name="role" id="role" class="form-control">
+                <option value="admin">Admin</option>
+                <option value="user">User</option>
+            </select>
+
+            <label for="customerCity">Customer City:</label>
+            <input type="text" id="customerCity" name="city" class="form-control" required>
+
+            <label for="customerAge">Customer Age:</label>
+            <input type="text" id="customerAge" name="age" class="form-control" required>
+
+            <button type="button" class="btn btn-primary" onclick="addCustomer()">Add Customer</button>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script>
         const MY_SERVER = "http://127.0.0.1:5000";
         function addCustomer() {
             var form = document.getElementById("addCustomerForm");
             var formData = new FormData(form);
 
-            const token = sessionStorage.getItem("access_token")
-
-
-
+            const token = sessionStorage.getItem("access_token");
 
             axios.post(`${MY_SERVER}/addcustomer`, Object.fromEntries(formData), {
                 headers: {
@@ -71,13 +110,54 @@
                 },
             })
                 .then(response => {
-                    alert(response.data.message);
+                    Toastify({
+                        text: response.data.message,
+                        duration: 3000,
+                        close: true,
+                        gravity: "top",
+                        position: "right",
+                        style: {
+                            background: "green"
+                        },
+                    }).showToast();
                 })
                 .catch(error => {
                     console.error('Error:', error);
+                    Toastify({
+                        text: "Error adding customer. Please try again.",
+                        duration: 3000,
+                        close: true,
+                        gravity: "top",
+                        position: "right",
+                        style: {
+                            background: "red"
+                        },
+                    }).showToast();
                 });
         }
     </script>
 </body>
 
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add Customer</title>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">

@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.css">
     <link type="image/png" sizes="16x16" rel="icon" href=".../icons8-star-filled-16.png">
+    <link rel="icon" type="image/x-icon" href="/static/favicon.jpg">
+
 
     <style>
         body {
@@ -133,7 +135,10 @@
                 console.error("Logout failed:", error);
                 Toastify({
                     text: "Logout failed. Please try again.",
-                    duration: 3000
+                    duration: 3000,
+                    style: {
+                    background: "green"
+                },
                 }).showToast();
             }
         };

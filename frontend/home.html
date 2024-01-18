@@ -6,18 +6,63 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Library Management System</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <link rel="icon" type="image/x-icon" href="/static/favicon.jpg">
+
+    <style>
+        body {
+            background-color: black;
+            color: white;
+        }
+
+        .btn {
+            color: white;
+        }
+
+        .btn-outline-danger {
+            color: #dc3545;
+        }
+
+        .btn-warning {
+            color: #ffc107;
+        }
+
+        .btn-info {
+            color: #17a2b8;
+        }
+
+        .btn-success {
+            color: #28a745;
+        }
+
+        .card {
+            background-color: #343a40;
+            color: white;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        h1, h5 {
+            color: white;
+        }
+    </style>
 </head>
 
 <body>
     <div class="float-right mt-2">
         <button type="button" class="btn btn-outline-danger" onclick="logout()">Logout</button>
+        <button type="button" class="btn btn-outline-danger" onclick="unitTest()">unit test</button>
+        <a href="/frontend/login.html" class="btn btn-primary" onclick="login()">login</a>
+
     </div>
-</div>
+    </div>
 
     <div class="container mt-5">
         <h1 class="mb-4">Welcome to the Library</h1>
 
-        
+
 
         <div class="row">
             <div class="col-md-4">
@@ -123,15 +168,15 @@
 
 
         <div class="col-md-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Return a book</h5>
-                        <p class="card-text">return the book u have loan</p>
-                        <a href="/frontend/Return_book.html" class="btn btn-danger">return book</a>
-                    </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Return a book</h5>
+                    <p class="card-text">return the book u have loan</p>
+                    <a href="/frontend/Return_book.html" class="btn btn-danger">return book</a>
                 </div>
             </div>
         </div>
+    </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
@@ -144,35 +189,75 @@
 
     <!-- Include your JavaScript functions for library actions -->
     <script>
-         const MY_SERVER = "http://127.0.0.1:5000";
+        const MY_SERVER = "http://127.0.0.1:5000";
 
-const logout = async () => {
-    try {
-        const response = await axios.post(
-            `${MY_SERVER}/logout`,
-            {},
-            {
-                headers: {
-                    Authorization: `Bearer ${sessionStorage.getItem("access_token")}`
-                }
-            }
-        );
+        const logout = async () => {
+            try {
+                const response = await axios.post(
+                    `${MY_SERVER}/logout`,
+                    {},
+                    {
+                        headers: {
+                            Authorization: `Bearer ${sessionStorage.getItem("access_token")}`
+                        }
+                    }
+                );
+                
 
-        Toastify({
+                Toastify({
                     text: "Logout successful. Goodbye!",
                     duration: 3000
                 }).showToast();
 
-        // Handle successful logout, for example, redirect to login page
-        window.location.href = "/frontend/login.html";
-    } catch (error) {
-        console.error("Logout failed:", error);
-        Toastify({
-            text: "Logout failed. Please try again.",
-            duration: 3000
-        }).showToast();
-    }
-};
+                // Handle successful logout, for example, redirect to login page
+                window.location.href = "/frontend/login.html";
+            } catch (error) {
+                console.error("Logout failed:", error);
+                Toastify({
+                    text: "Logout failed. Please try again.",
+                    duration: 3000
+
+                }).showToast();
+            }
+        };
+
+        function unitTest() {
+            // Set default values for a book
+            var defaultBook = {
+                "name": "Default Book",
+                "author": "Default Author",
+                "year_published": "2022",
+                "book_type": "1"
+            };
+
+            // Use Axios for the POST request
+            const token = sessionStorage.getItem("access_token");
+            axios.post(`${MY_SERVER}/addbook`, defaultBook,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    },
+                })
+                .then(response => {
+                    console.log(response);
+                    Toastify({
+                        text: "Unit test successful - Default book added",
+                        duration: 5000,
+                        close: true,
+                        gravity: "top",
+                        position: "right",
+                        style: {
+                            background: "green"
+                        },
+                    }).showToast();
+
+                    // Now call addBook to display the success message
+                    addBook();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
 
 
     </script>
