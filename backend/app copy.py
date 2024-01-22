@@ -61,13 +61,12 @@ class Loan(db.Model):
     id = db.Column(db.Integer, primary_key=True,)
     loan_date = db.Column(db.Date ,default = dt.now(), nullable=False)
     return_date = db.Column(db.Date,nullable = True)
-
+  
     # Foreign keys referencing Customer and Book
     customer_id = db.Column(db.Integer, db.ForeignKey('customers.id'), nullable=False)
     book_id = db.Column(db.Integer, db.ForeignKey('books.id'), nullable=False)
     
    
-
     def __init__(self,customer_id,book_id):
         book = Book.query.get(book_id)
         book_type = ic(book.book_type)
@@ -82,6 +81,16 @@ class Loan(db.Model):
         ic(return_date)
         super().__init__(customer_id=customer_id,book_id=book_id)
 
+
+# class Users(db.Model):
+#     __tablename__ = 'Users'
+#     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+#     username = db.Column(db.String(45), nullable=False, unique=True)
+#     password = db.Column(db.String(45), nullable=False)
+#     role = db.Column(db.String(45), nullable=False, default='user')  # Assuming 'user' is the default role
+#     customer_id = db.Column(db.Integer, db.ForeignKey('customers.id'), nullable=False)
+#     customer = db.relationship('Customer', backref='users')
+    
 
 
 
@@ -146,6 +155,48 @@ def logout():
         print(str(e))
         return jsonify({'error': 'Internal Server Error'}), 500
 
+
+# @app.route('/signup', methods=['POST'])
+# def signup():
+#     request_data = request.get_json()
+#     print(request_data)
+#     username = request_data['username']
+#     password = request_data['password']
+#     role = request_data['role']
+#     username = request_data['username']
+#     username = request_data['username']
+#     customer_name = request_data['customer_name']
+    
+#     customer= Customer.query.filter_by(name=customer_name).first()
+#     if customer: 
+
+#     # Check if the username is already taken
+#         existing_user = Users.query.filter_by(username=username).first()
+#         if existing_user:
+#             return jsonify({'message': 'Username is already taken'}), 400
+
+#         # Hash and salt the password using Bcrypt
+#         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+
+#         # Create a new user and add to the database
+#         new_user = Users(username=username, password=hashed_password, role=role, customer_id = customer.id)
+#         ic(type(new_user))
+#         db.session.add(new_user)
+#         db.session.commit()
+
+#     # Customize the response message based on the role
+#         if role == 'admin':
+#             return jsonify({'message': 'Admin created successfully'}), 201
+#         else:
+#             return jsonify({'message': 'User created successfully'}), 201
+#     return jsonify({'message': 'ni customer'}), 201
+
+
+
+
+
+
+
 @app.route('/login', methods=['POST'])
 def login():
     try:
@@ -181,6 +232,23 @@ def login():
     except Exception as e:
         print("Login error:", str(e))
         return jsonify({'message': 'Internal Server Error'}), 500
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 @app.route('/addcustomer', methods=['POST'])
@@ -293,23 +361,13 @@ def list_loans():
                 '2': "5 days",
                 '3': "2 days"
             }.get(loan.books.book_type, 0),  # Calculate max_loan_duration based on book_type
-            'return_status': "Returned" if loan.return_date else "Not Returned",  # Add return_status based on return_date
-            'availability_status': is_book_available(loan.books.id)  # Check book availability
+            'return_status': "Returned" if loan.return_date else "Not Returned"  # Add return_status based on return_date
         }
         for loan in loans
     ]
 
     # Return the list of loans as JSON
     return jsonify({'loans': loan_list})
-
-def is_book_available(book_id):
-    # Implement your logic to check if the book is available
-    # For example, check if the book is currently on loan or available in stock
-    # You might need to adapt this based on your database structure and loan logic
-
-    # Assuming that if the book is on loan, it is not available
-    return not Loan.query.filter_by(book_id=book_id, return_date=None).first()
-
 
 
 @app.route('/listcustomers', methods=['GET'])
@@ -364,8 +422,9 @@ def list_books():
     return jsonify({'books': book_list})
 
 @app.route('/findbook/<string:book_name>', methods=['GET'])
-@jwt_required()
+@jwt_required() 
 def find_book(book_name):
+    
     # Query the book by name
     book = Book.query.filter_by(name=book_name).first()
 
@@ -373,19 +432,15 @@ def find_book(book_name):
     if not book:
         return jsonify({'error': 'Book not found'})
 
-    # Return book information including max_loan_duration as JSON
+    # Return book information as JSON
     return jsonify({'book': {
         'id': book.id,
         'name': book.name,
         'author': book.author,
         'year_published': book.year_published,
-        'book_type': book.book_type,
-        'max_loan_duration': {
-            '1': "10 days",
-            '2': "5 days",
-            '3': "2 days"
-        }.get(book.book_type, 0)
+        'book_type': book.book_type
     }})
+
 
 @app.route('/findcustomer/<string:customer_name>', methods=['GET'])
 @jwt_required() 
@@ -421,7 +476,7 @@ def delete_loan_by_id(loan_id):
         loan = Loan.query.filter_by(id=loan_id, customer_id=user.id).first()
 
         if not loan:
-            return jsonify({'error': 'Loan not found or does not belong to the user'}), 404
+            return jsonify({'error': 'Loan not found'}), 404
 
         # Delete the loan
         db.session.delete(loan)
@@ -432,6 +487,38 @@ def delete_loan_by_id(loan_id):
         print(str(e))
         return jsonify({'error': 'Internal Server Error'}), 500
 
+
+@app.route('/lateloans', methods=['GET'])
+@jwt_required()
+def late_loans():
+
+
+
+    # Query all loans from the database with related customer and book information
+    loans = Loan.query.join(Customer, Loan.customer_id == Customer.id).join(Book, Loan.book_id == Book.id).all()
+
+    # Calculate the current date
+    current_date = dt.utcnow()
+
+    # Create a list of dictionaries containing overdue loan information, customer name, book name, and max_loan_duration
+    late_loan_list = [
+        {
+            'loan_date': loan.loan_date,
+            'return_date': loan.return_date,
+            'customer_name': loan.customers.name,  # Use the 'name' attribute of the Customer model
+            'book_name': loan.books.name,  # Use the 'name' attribute of the Book model
+            'max_loan_duration': {
+                '1': "10 days",
+                '2': "5 days",
+                '3': "2 days"
+            }.get(loan.books.book_type, 0),  # Calculate max_loan_duration based on book_type
+            'days_late': max(0, (current_date - loan.return_date).days)  # Calculate days late
+        }
+        for loan in loans if loan.return_date and current_date > loan.return_date
+    ]
+
+    # Return the list of late loans as JSON
+    return jsonify({'late_loans': late_loan_list})
 
 
 @app.route('/userloans', methods=['GET'])
@@ -465,6 +552,46 @@ def get_user_loans():
     except Exception as e:
         print(str(e))
         return jsonify({'error': 'Internal Server Error'}), 500
+    
+
+@app.route('/returnbook', methods=['DELETE'])
+@jwt_required()  # Requires a valid access token
+def return_book():
+    try:
+        current_user = get_jwt_identity()
+
+        # Find the user by ID
+        user = Customer.query.filter_by(id=current_user).first()
+
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+
+        # Retrieve the list of book IDs to return from the request payload
+        book_ids_to_return = request.get_json().get('book_ids', [])
+
+        if not book_ids_to_return:
+            return jsonify({'error': 'No book IDs provided for return'}), 400
+
+        # Find the loans to return based on book IDs and user ID
+        loans_to_return = Loan.query.filter(Loan.book_id.in_(book_ids_to_return), Loan.customer_id == user.id).all()
+
+        if not loans_to_return:
+            return jsonify({'error': 'No matching loans found for return'}), 404
+
+        # Mark the loans as returned by updating the return_date
+        for loan in loans_to_return:
+            loan.return_date = datetime.utcnow()
+
+        # Commit the changes to the database
+        db.session.commit()
+
+        return jsonify({'message': 'Books returned successfully'})
+    except Exception as e:
+        print(str(e))
+        return jsonify({'error': 'Internal Server Error'}), 500
+
+
+
 
 
 
