@@ -10,7 +10,6 @@
     <link type="image/png" sizes="16x16" rel="icon" href=".../icons8-star-filled-16.png">
     <link rel="icon" type="image/x-icon" href="/static/favicon.jpg">
 
-
     <style>
         body {
             background-color: #f8f9fa;
@@ -54,14 +53,17 @@
             background-color: #dc3545;
             border-color: #dc3545;
         }
+
+        .loan-list {
+            margin-top: 20px;
+        }
     </style>
 </head>
 
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark">
         <a class="navbar-brand" href="#">
-            <img src="library.jpg" alt="Library Logo" width="100"> Library System
-        
+            <img src="/static/library.jpg" alt="Library Logo" width="100"> Library System
         </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
             aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -77,9 +79,31 @@
     </nav>
 
     <div class="container mt-4">
-        <h1>Welcome to my the Library</h1>
+        <h1>Welcome to the Library</h1>
 
         <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Your Loans</h5>
+                        <p class="card-text">View the list of books you have borrowed.</p>
+                        <div class="loan-list">
+                            <table class="table">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th scope="col"></th> <!-- Add an empty header for checkboxes -->
+                                        <th scope="col">Book</th>
+                                        <th scope="col">Loan Date</th>
+                                        <th scope="col">Return Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="userLoanList"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-body">
@@ -95,7 +119,7 @@
                     <div class="card-body">
                         <h5 class="card-title">Return a Book</h5>
                         <p class="card-text">Return a book that you have borrowed.</p>
-                        <a href="/frontend/Return_book.html" class="btn btn-danger">Return Book</a>
+                        <button type="button" class="btn btn-danger" onclick="returnSelectedBooks()">Return Selected</button>
                     </div>
                 </div>
             </div>
@@ -111,6 +135,102 @@
     <script>
         const MY_SERVER = "http://127.0.0.1:5000";
 
+        document.addEventListener('DOMContentLoaded', function () {
+            fetchUserLoans();
+        });
+
+        async function fetchUserLoans() {
+            try {
+                const token = sessionStorage.getItem("access_token");
+                const response = await axios.get(`${MY_SERVER}/userloans`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+
+                const userLoans = response.data.loans;
+                displayUserLoans(userLoans);
+            } catch (error) {
+                console.error('Error fetching user loans:', error);
+            }
+        }
+
+        function displayUserLoans(userLoans) {
+            const userLoanList = document.getElementById('userLoanList');
+
+            // Clear existing content
+            userLoanList.innerHTML = '';
+
+            // Display user's loans in a table
+            userLoans.forEach(loan => {
+                const row = userLoanList.insertRow();
+                const cellCheckbox = row.insertCell(0);
+                const cellBook = row.insertCell(1);
+                const cellLoanDate = row.insertCell(2);
+                const cellReturnDate = row.insertCell(3);
+
+                // Add a checkbox to each row
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.value = loan.id; // Use the loan ID as the value
+                cellCheckbox.appendChild(checkbox);
+
+                cellBook.textContent = loan.book_name;
+                cellLoanDate.textContent = formatDate(loan.loan_date);
+                cellReturnDate.textContent = formatDate(loan.return_date);
+            });
+        }
+
+        function returnSelectedBooks() {
+            const checkboxes = document.querySelectorAll('#userLoanList input[type="checkbox"]:checked');
+
+            if (checkboxes.length === 0) {
+                alert("Please select at least one book to return.");
+                return;
+            }
+
+            const selectedBookIds = Array.from(checkboxes).map(checkbox => checkbox.value);
+            const token = sessionStorage.getItem("access_token")
+
+            // Make an API call to return the selected books
+            axios.delete(`${MY_SERVER}/deletebook`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                },
+                data: {
+                    book_ids: selectedBookIds
+                }
+            })
+            .then(response => {
+                // Handle the success case
+                console.log(response.data.message);
+                Toastify({
+                    text: response.data.message,
+                    duration: 3000
+                }).showToast();
+
+                // Refresh the user's loan list after successful return
+                fetchUserLoans();
+            })
+            .catch(error => {
+                // Handle the error case
+                console.error("Error returning books:", error);
+                Toastify({
+                    text: "Error returning books. Please try again.",
+                    duration: 3000,
+                    style: {
+                        background: "red"
+                    },
+                }).showToast();
+            });
+        }
+
+        function formatDate(dateString) {
+            const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+            const formattedDate = new Date(dateString).toLocaleDateString('en-GB', options);
+            return formattedDate;
+        }
+
         const logout = async () => {
             try {
                 const response = await axios.post(
@@ -122,14 +242,12 @@
                         }
                     }
                 );
-                
 
                 Toastify({
                     text: "Logout successful. Goodbye!",
                     duration: 3000
                 }).showToast();
 
-                // Handle successful logout, for example, redirect to login page
                 window.location.href = "/frontend/login.html";
             } catch (error) {
                 console.error("Logout failed:", error);
@@ -137,8 +255,8 @@
                     text: "Logout failed. Please try again.",
                     duration: 3000,
                     style: {
-                    background: "green"
-                },
+                        background: "green"
+                    },
                 }).showToast();
             }
         };

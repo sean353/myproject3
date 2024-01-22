@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,28 +10,28 @@
     <link rel="icon" type="image/x-icon" href="/static/favicon.jpg">
 
 </head>
+
 <body>
     <div class="btn-group-vertical">
-        <a href="/frontend/home.html" class="btn btn-primary"  onclick="displayAllBooks()">Home page</a>   
-        <a href="/frontend/list_book.html" class="btn btn-primary"  onclick="displayAllBooks()">Display All Books</a>
+        <a href="/frontend/home.html" class="btn btn-primary" onclick="displayAllBooks()">Home page</a>
+        <a href="/frontend/list_book.html" class="btn btn-primary" onclick="displayAllBooks()">Display All Books</a>
         <a href="/frontend/customer_list.html" class="btn btn-primary" onclick="displayAllCustomers()">Display All Customers</a>
         <a href="/frontend/loans_list.html" class="btn btn-primary" onclick="displayAllLoans()">Display All Loans</a>
-        <a href="/frontend/late_loans.html" class="btn btn-warning" onclick="displayLateLoans()">Display Late Loans</a>
         <a href="/frontend/find_book.html" class="btn btn-info" onclick="findBookByName()">Find Book by Name</a>
         <a href="/frontend/find_customer.html" class="btn btn-info" onclick="findCustomerByName()">Find Customer by Name</a>
     </div>
-</div>
     <div class="container mt-5">
         <h1>List of Loans</h1>
         <table class="table">
             <thead>
                 <tr>
-                    
                     <th>Loan Date</th>
                     <th>Return Date</th>
-                    <th>customer name</th>
-                    <th>Book name</th>
-                    
+                    <th>Customer Name</th>
+                    <th>Book Name</th>
+                    <th>Max Loan Duration</th>
+                    <th>Return Status</th>
+                    <th>Availability Status</th> <!-- New column for availability status -->
                 </tr>
             </thead>
             <tbody id="loanListBody">
@@ -64,10 +65,11 @@
                         Authorization: `Bearer ${token}`,
                     },
                 })
-            
+
                 .then(response => {
                     const loanList = response.data.loans;
                     displayLoanList(loanList);
+
                 })
                 .catch(error => {
                     console.error('Error:', error);
@@ -75,26 +77,33 @@
         }
 
         function displayLoanList(loanList) {
-        const loanListBody = document.getElementById('loanListBody');
+            const loanListBody = document.getElementById('loanListBody');
 
-        // Clear existing rows
-        loanListBody.innerHTML = "";
+            // Clear existing rows
+            loanListBody.innerHTML = "";
 
-        // Populate the table with loan data, customer name, and book name
-        loanList.forEach(loan => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                
-                <td>${loan.loan_date}</td>
-                <td>${loan.return_date}</td>
-                <td>${loan.customer_name}</td>
-                <td>${loan.book_name}</td>
-                
-                
-            `;
-            loanListBody.appendChild(row);
-        });
-    }
+            // Populate the table with loan data, customer name, book name, return status, and availability status
+            loanList.forEach(loan => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${formatDate(loan.loan_date)}</td>
+                    <td>${loan.return_date ? formatDate(loan.return_date) : 'null'}</td>
+                    <td>${loan.customer_name}</td>
+                    <td>${loan.book_name}</td>
+                    <td>${loan.max_loan_duration}</td>
+                    <td>${loan.return_status}</td>
+                    <td>${loan.availability_status}</td> <!-- Display the availability status -->
+                `;
+                loanListBody.appendChild(row);
+            });
+        }
+
+        function formatDate(dateString) {
+            const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+            const formattedDate = new Date(dateString).toLocaleDateString('en-GB', options);
+            return formattedDate;
+        }
     </script>
 </body>
+
 </html>

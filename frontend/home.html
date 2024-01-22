@@ -44,7 +44,8 @@
             padding: 20px;
         }
 
-        h1, h5 {
+        h1,
+        h5 {
             color: white;
         }
     </style>
@@ -61,8 +62,6 @@
 
     <div class="container mt-5">
         <h1 class="mb-4">Welcome to the Library</h1>
-
-
 
         <div class="row">
             <div class="col-md-4">
@@ -103,17 +102,6 @@
             <div class="col-md-4">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Display Late Loans</h5>
-                        <p class="card-text">View loans that are overdue.</p>
-                        <a href="/frontend/late_loans.html" class="btn btn-warning" onclick="displayLateLoans()">View
-                            Late Loans</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-body">
                         <h5 class="card-title">Find Book by Name</h5>
                         <p class="card-text">Search for a specific book by its name.</p>
                         <a href="/frontend/find_book.html" class="btn btn-info" onclick="findBookByName()">Find Book</a>
@@ -131,9 +119,7 @@
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="row mt-4">
             <div class="col-md-4">
                 <div class="card">
                     <div class="card-body">
@@ -143,40 +129,10 @@
                     </div>
                 </div>
             </div>
-
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Add a Customer</h5>
-                        <p class="card-text">Register a new customer to the library.</p>
-                        <a href="/frontend/add_customer.html" class="btn btn-success">Add Customer</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Add a Loan</h5>
-                        <p class="card-text">Borrow a book by creating a new loan.</p>
-                        <a href="/frontend/add_loan.html" class="btn btn-success">Add Loan</a>
-                    </div>
-                </div>
-            </div>
         </div>
         <br>
 
 
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Return a book</h5>
-                    <p class="card-text">return the book u have loan</p>
-                    <a href="/frontend/Return_book.html" class="btn btn-danger">return book</a>
-                </div>
-            </div>
-        </div>
-    </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
@@ -202,7 +158,7 @@
                         }
                     }
                 );
-                
+
 
                 Toastify({
                     text: "Logout successful. Goodbye!",
@@ -258,8 +214,6 @@
                     console.error('Error:', error);
                 });
         }
-
-
     </script>
 
 </body>
