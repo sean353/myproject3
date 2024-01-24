@@ -163,6 +163,7 @@
 
             // Display user's loans in a table
             userLoans.forEach(loan => {
+                
                 const row = userLoanList.insertRow();
                 const cellCheckbox = row.insertCell(0);
                 const cellBook = row.insertCell(1);
@@ -183,22 +184,24 @@
 
         function returnSelectedBooks() {
             const checkboxes = document.querySelectorAll('#userLoanList input[type="checkbox"]:checked');
+            console.log(checkboxes);
 
             if (checkboxes.length === 0) {
                 alert("Please select at least one book to return.");
                 return;
             }
 
-            const selectedBookIds = Array.from(checkboxes).map(checkbox => checkbox.value);
+            const selectedloansids = Array.from(checkboxes).map(checkbox => checkbox.value);
+            console.log(selectedloansids);
             const token = sessionStorage.getItem("access_token")
 
             // Make an API call to return the selected books
-            axios.delete(`${MY_SERVER}/deletebook`, {
+            axios.delete(`${MY_SERVER}/deleteloan/${selectedloansids[0]}`,  {
                 headers: {
                     Authorization: `Bearer ${token}`
                 },
                 data: {
-                    book_ids: selectedBookIds
+                    book_ids: selectedloansids
                 }
             })
             .then(response => {
