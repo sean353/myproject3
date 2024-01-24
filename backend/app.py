@@ -61,6 +61,8 @@ class Loan(db.Model):
     id = db.Column(db.Integer, primary_key=True,)
     loan_date = db.Column(db.Date ,default = dt.now(), nullable=False)
     return_date = db.Column(db.Date,nullable = True)
+    is_returned = db.Column(db.Boolean, default=False, nullable=True)
+
 
     # Foreign keys referencing Customer and Book
     customer_id = db.Column(db.Integer, db.ForeignKey('customers.id'), nullable=False)
@@ -239,11 +241,16 @@ def add_loan():
             return jsonify({'error': 'Customer or book not found'}), 404
         
          # Check if the customer has already borrowed the book
-        existing_loan = Loan.query.filter_by(customer_id=customer.id, book_id=book.id).first()
-        if existing_loan:
-            return jsonify({'error': 'Customer has already borrowed this book'}), 400
+        existing_loan = Loan.query.filter_by(customer_id=customer.id, book_id=book.id).all()
 
+        if len(existing_loan) > 0 :
 
+            if  existing_loan[-1] and existing_loan[-1].is_returned == False:
+                ic("in the if")
+                ic( existing_loan[-1] and existing_loan[-1].is_returned == False)
+                return jsonify({'error': 'Customer has already borrowed this book'}), 400
+            
+        
         # Create a new loan associated with the customer and book
         new_loan = Loan(
             # loan_date=dt.now().strftime('%Y-%m-%d'),
@@ -255,7 +262,7 @@ def add_loan():
         db.session.add(new_loan)
         db.session.commit()
 
-        return jsonify({'message': 'Loan added successfully'})
+        return jsonify({'message': 'Loan added successfully'}), 201
 
     except Exception as e:
         print(str(e))
@@ -307,7 +314,7 @@ def list_loans():
                 '2': "5 days",
                 '3': "2 days"
             }.get(loan.books.book_type, 0),  # Calculate max_loan_duration based on book_type
-            'return_status': "Returned" if loan.is_return_date_passed() else "Not Returned",  # Add return_status based on return_date
+            'return_status': "Returned" if loan.is_returned else "Not Returned",  # Add return_status based on return_date
             'availability_status': is_book_available(loan.books.id)  # Check book availability
         }
         for loan in loans
@@ -446,10 +453,12 @@ def delete_loan_by_id():
             ic(loan_list_from_payload)
             if not loan:
                 return jsonify({'error': 'Loan not found or does not belong to the user'}), 404
+            
+            loan.is_returned = True
         
 
             # Delete the loan
-            db.session.delete(loan)
+            #db.session.delete(loan)
             db.session.commit()
 
         return jsonify({'message': 'Loan deleted successfully'})

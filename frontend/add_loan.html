@@ -47,7 +47,7 @@
         <h1 class="mb-4">Library Management System</h1>
 
 
-        
+
 
         <div class="container mt-5">
             <h1>Add Loan</h1>
@@ -104,25 +104,31 @@
                 }
             }
 
-            
+
             // Call fetchBooks and fetchCustomers when the page loads
             fetchBooks();
             // fetchCustomers();
 
-            function addLoan() {
+            const addLoan = async () => {
                 var form = document.getElementById("addLoanForm");
                 var formData = new FormData(form);
 
-                const token = sessionStorage.getItem("access_token")
+                const token = sessionStorage.getItem("access_token");
 
+                try {
+                    var response = await axios.post(`${MY_SERVER}/addloan`, Object.fromEntries(formData), {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    });
 
+                    // Check response status
+                    console.log(response.status);
 
-                axios.post(`${MY_SERVER}/addloan`, Object.fromEntries(formData), {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                })
-                    .then(response => {
+                    const status = response.status;
+
+                    if (status === 201) {
+                        console.log("blabllablbllalbal");
                         Toastify({
                             text: response.data.message,
                             duration: 3000,
@@ -130,23 +136,56 @@
                             gravity: "top",
                             position: "right",
                             style: {
-                                background: "green"
+                                background: "green",
                             },
                         }).showToast();
-                    })
-                    .catch(error => {
+                    }
+                } catch (error) {
+
+                    console.log(error.response.status);
+                    console.log(error);
+
+                    if (error.response.status === 400) {
+                        
                         Toastify({
-                            text: "Book cant loand twice",
+                            text: "Book is on loan",
                             duration: 3000,
                             close: true,
                             gravity: "top",
                             position: "right",
                             style: {
-                                background: "red"
+                                background: "red",
                             },
                         }).showToast();
-                    });
-            }
+                    } else if (error.response.status === 404) {
+                        Toastify({
+                            text: "Book is not found",
+                            duration: 3000,
+                            close: true,
+                            gravity: "top",
+                            position: "right",
+                            style: {
+                                background: "red",
+                            },
+                        }).showToast();
+                    } else {
+
+                        Toastify({
+                            text: "error",
+                            duration: 3000,
+                            close: true,
+                            gravity: "top",
+                            position: "right",
+                            style: {
+                                background: "red",
+                            },
+                        }).showToast();
+                    }
+
+
+                }
+            };
+
         </script>
 </body>
 
