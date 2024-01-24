@@ -196,12 +196,12 @@
             const token = sessionStorage.getItem("access_token")
 
             // Make an API call to return the selected books
-            axios.delete(`${MY_SERVER}/deleteloan/${selectedloansids[0]}`,  {
+            axios.delete(`${MY_SERVER}/deleteloan/`,  {
                 headers: {
                     Authorization: `Bearer ${token}`
                 },
                 data: {
-                    book_ids: selectedloansids
+                    loan_ids: selectedloansids
                 }
             })
             .then(response => {

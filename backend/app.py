@@ -421,7 +421,7 @@ def find_customer(customer_name):
 
 @app.route('/deleteloan/', methods=['DELETE'])
 @jwt_required()  # Requires a valid access token
-def delete_loan_by_id(loan_id):
+def delete_loan_by_id():
     try:
         ic("-------------------------------------")
         current_user = get_jwt_identity()
@@ -434,18 +434,23 @@ def delete_loan_by_id(loan_id):
         if not user:
             return jsonify({'error': 'User not found'}), 404
         
+        loan_list_from_payload = request.get_json()["loan_ids"]
 
-        # Find the loan by ID
-        loan = Loan.query.filter_by(id=loan_id, customer_id=user.id).first()
 
-        ic("===================================")
-        if not loan:
-            return jsonify({'error': 'Loan not found or does not belong to the user'}), 404
         
 
-        # Delete the loan
-        db.session.delete(loan)
-        db.session.commit()
+        for loan_id in loan_list_from_payload:
+            # Find the loan by ID
+            loan = Loan.query.filter_by(id=loan_id, customer_id=user.id).first()
+
+            ic(loan_list_from_payload)
+            if not loan:
+                return jsonify({'error': 'Loan not found or does not belong to the user'}), 404
+        
+
+            # Delete the loan
+            db.session.delete(loan)
+            db.session.commit()
 
         return jsonify({'message': 'Loan deleted successfully'})
     except Exception as e:
