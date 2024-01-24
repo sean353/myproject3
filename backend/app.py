@@ -83,6 +83,20 @@ class Loan(db.Model):
         super().__init__(customer_id=customer_id,book_id=book_id)
 
 
+    def is_return_date_passed(self):
+        """
+        Check if the return date has passed for the loan.
+
+        Returns:
+            bool: True if the return date has passed, False otherwise.
+
+        """
+       
+        if (dt.now().date()) > self.return_date:
+            return True
+        return False
+
+
 
 
 def generate_token(user_id):
@@ -293,7 +307,7 @@ def list_loans():
                 '2': "5 days",
                 '3': "2 days"
             }.get(loan.books.book_type, 0),  # Calculate max_loan_duration based on book_type
-            'return_status': "Returned" if loan.return_date else "Not Returned",  # Add return_status based on return_date
+            'return_status': "Returned" if loan.is_return_date_passed() else "Not Returned",  # Add return_status based on return_date
             'availability_status': is_book_available(loan.books.id)  # Check book availability
         }
         for loan in loans
@@ -405,23 +419,29 @@ def find_customer(customer_name):
         'age': customer.age
     }})
 
-@app.route('/deleteloan/<int:loan_id>', methods=['DELETE'])
+@app.route('/deleteloan/', methods=['DELETE'])
 @jwt_required()  # Requires a valid access token
 def delete_loan_by_id(loan_id):
     try:
+        ic("-------------------------------------")
         current_user = get_jwt_identity()
+
 
         # Find the user by ID
         user = Customer.query.filter_by(id=current_user).first()
 
+        ic("------------------------")
         if not user:
             return jsonify({'error': 'User not found'}), 404
+        
 
         # Find the loan by ID
         loan = Loan.query.filter_by(id=loan_id, customer_id=user.id).first()
 
+        ic("===================================")
         if not loan:
             return jsonify({'error': 'Loan not found or does not belong to the user'}), 404
+        
 
         # Delete the loan
         db.session.delete(loan)
@@ -452,12 +472,15 @@ def get_user_loans():
         # Create a list of dictionaries containing loan information
         loan_list = [
             {
+                'id':loan.Loan.id,
                 'loan_date': loan.Loan.loan_date,
                 'return_date': loan.Loan.return_date,
                 'book_name': loan.Book.name,
+                
             }
             for loan in user_loans
         ]
+  
 
         # Return the list of user loans as JSON
         return jsonify({'loans': loan_list})
