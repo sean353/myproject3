@@ -7,28 +7,28 @@ This Flask application serves as a simple library management system. It allows u
 ## Installation
 
 1. **Clone the repository:**
-   ```bash
-   git clone <repository_url>sdsd
-   ```
+   
+   git clone https://github.com/sean353/myproject3.git
+   
 
 2. **Install dependencies:**
-   ```bash
+   
    pip install -r requirements.txt
-   ```
+   
 
 ## Usage
 
 1. **Set up the SQLite database:**
-   ```bash
+   
    python
    from app import db
    db.create_all()
-   ```
+  
 
 2. **Run the Flask application:**
-   ```bash
-   python app.py
-   ```
+    cd backend and then py app.py
+   
+   
 
 3. **Access the API endpoints using tools like `curl` or `Postman`.**
 
