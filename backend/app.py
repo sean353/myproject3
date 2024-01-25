@@ -236,14 +236,20 @@ def add_loan():
             return jsonify({'error': 'Customer or book not found'}), 404
         
          # Check if the customer has already borrowed the book
-        existing_loan = Loan.query.filter_by(customer_id=customer.id, book_id=book.id).all()
+        existing_loan = Loan.query.filter_by(book_id=book.id).all()
 
         if len(existing_loan) > 0 :
 
-            if  existing_loan[-1] and existing_loan[-1].is_returned == False:
-                ic("in the if")
-                ic( existing_loan[-1] and existing_loan[-1].is_returned == False)
-                return jsonify({'error': 'Customer has already borrowed this book'}), 400
+            for loan in existing_loan:
+
+                if loan.is_returned == False:
+                    return jsonify({'error': 'Customer has already borrowed this book'}), 400
+
+
+                # if  existing_loan[-1] and existing_loan[-1].is_returned == False:
+                #     ic("in the if")
+                #     ic( existing_loan[-1] and existing_loan[-1].is_returned == False)
+                #     return jsonify({'error': 'Customer has already borrowed this book'}), 400
             
         
         # Create a new loan associated with the customer and book
@@ -498,7 +504,9 @@ def get_user_loans():
                 'book_name': loan.Book.name,
                 
             }
-            for loan in user_loans
+            for loan in user_loans if not loan.Loan.is_returned  # Only include if loan.is_returned is False
+
+            
         ]
   
 

@@ -113,7 +113,7 @@
                 console.log(isOverdue,returnstatus);
 
                 // Apply red color if the loan is overdue
-                const rowStyle = isOverdue && returnstatus=="Not Returned" ? 'color: red;' : ''; // Ternary operator to conditionally set the style
+                const rowStyle = isOverdue && returnstatus=="Not Returned"  ? 'color: red;' : ''; // Ternary operator to conditionally set the style
 
                 // Populate other cells in the row and append it to the table body
                 row.innerHTML = `
