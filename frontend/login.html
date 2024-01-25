@@ -14,7 +14,7 @@
     <!-- Custom Styles -->
     <style>
         body {
-            background-color: #000;
+            background-color: #343a40;
             color: #fff;
         }
 
@@ -33,6 +33,8 @@
             color: white;
             text-align: center;
             border-radius: 15px 15px 0 0;
+            padding: 20px 0;
+            font-size: 1.5rem;
         }
 
         .btn-primary {
@@ -44,6 +46,28 @@
         .btn-primary:hover {
             background-color: #0056b3;
         }
+
+        .form-control {
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        .btn-block {
+            border-radius: 5px;
+        }
+
+        .btn-block:hover {
+            opacity: 0.9;
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .register-link a {
+            color: #007bff;
+        }
     </style>
 </head>
 
@@ -54,27 +78,20 @@
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header">
-                        <h3>Login</h3>
+                        Login
                     </div>
                     <div class="card-body">
                         <form id="loginForm">
                             <div class="form-group">
-                                <label for="username">Username</label>
-                                <input type="text" class="form-control" id="username" name="username" required>
+                                <input type="text" class="form-control" id="username" name="username" placeholder="Username" required>
                             </div>
                             <div class="form-group">
-                                <label for="password">Password</label>
-                                <input type="password" class="form-control" id="password" name="password" required>
+                                <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
                             </div>
-                            <!-- <div class="form-group">
-                                <label for="role">Role</label>
-                                <select class="form-control" id="role" name="role" required>
-                                    <option value="0">User</option>
-                                    <option value="1">Admin</option>
-                                </select>
-                            </div> -->
-                            <button type="button" class="btn btn-primary btn-block" onclick="login()">Login</button><br>
-                            <a href="add_customer.html"><button type="button" class="btn btn-primary btn-block">Register</button></a>
+                            <button type="button" class="btn btn-primary btn-block" onclick="login()">Login</button>
+                            <div class="register-link">
+                                <a href="add_customer.html">Register</a>
+                            </div>
                         </form>
                     </div>
                 </div>

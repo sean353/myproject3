@@ -15,10 +15,12 @@
     <div class="btn-group-vertical">
         <a href="/frontend/home.html" class="btn btn-primary" onclick="displayAllBooks()">Home page</a>
         <a href="/frontend/list_book.html" class="btn btn-primary" onclick="displayAllBooks()">Display All Books</a>
-        <a href="/frontend/customer_list.html" class="btn btn-primary" onclick="displayAllCustomers()">Display All Customers</a>
+        <a href="/frontend/customer_list.html" class="btn btn-primary" onclick="displayAllCustomers()">Display All
+            Customers</a>
         <a href="/frontend/loans_list.html" class="btn btn-primary" onclick="displayAllLoans()">Display All Loans</a>
         <a href="/frontend/find_book.html" class="btn btn-info" onclick="findBookByName()">Find Book by Name</a>
-        <a href="/frontend/find_customer.html" class="btn btn-info" onclick="findCustomerByName()">Find Customer by Name</a>
+        <a href="/frontend/find_customer.html" class="btn btn-info" onclick="findCustomerByName()">Find Customer by
+            Name</a>
     </div>
     <div class="container mt-5">
         <h1>List of Loans</h1>
@@ -31,7 +33,7 @@
                     <th>Book Name</th>
                     <th>Max Loan Duration</th>
                     <th>Return Status</th>
-                   <!-- New column for availability status -->
+                    <!-- New column for availability status -->
                 </tr>
             </thead>
             <tbody id="loanListBody">
@@ -79,21 +81,52 @@
         function displayLoanList(loanList) {
             const loanListBody = document.getElementById('loanListBody');
 
+
+
+
+
+
             // Clear existing rows
             loanListBody.innerHTML = "";
 
             // Populate the table with loan data, customer name, book name, return status, and availability status
+            //     loanList.forEach(loan => {
+
+            //         const row = document.createElement('tr');
+            //         row.innerHTML = `
+            //             <td>${formatDate(loan.loan_date)}</td>
+            //             <td>${loan.return_date ? formatDate(loan.return_date) : 'null'}</td>
+            //             <td>${loan.customer_name}</td>
+            //             <td>${loan.book_name}</td>
+            //             <td>${loan.max_loan_duration}</td>
+            //             <td>${loan.return_status}</td>
+            //              <!-- Display the availability status -->
+            //         `;
+            //         loanListBody.appendChild(row);
+            //     });
+            // }
+
             loanList.forEach(loan => {
                 const row = document.createElement('tr');
+                const isOverdue = loan.is_over_due;
+
+                // Apply red color if the loan is overdue
+                const rowStyle = isOverdue ? 'color: red;' : ''; // Ternary operator to conditionally set the style
+
+                // Populate other cells in the row and append it to the table body
                 row.innerHTML = `
-                    <td>${formatDate(loan.loan_date)}</td>
-                    <td>${loan.return_date ? formatDate(loan.return_date) : 'null'}</td>
-                    <td>${loan.customer_name}</td>
-                    <td>${loan.book_name}</td>
-                    <td>${loan.max_loan_duration}</td>
-                    <td>${loan.return_status}</td>
-                     <!-- Display the availability status -->
-                `;
+        <td>${formatDate(loan.loan_date)}</td>
+        <td>${loan.return_date ? formatDate(loan.return_date) : 'null'}</td>
+        <td>${loan.customer_name}</td>
+        <td>${loan.book_name}</td>
+        <td>${loan.max_loan_duration}</td>
+        <td>${loan.return_status}</td>
+        <!-- Display the availability status -->
+    `;
+
+                // Apply the inline style to the row
+                row.setAttribute('style', rowStyle);
+
                 loanListBody.appendChild(row);
             });
         }

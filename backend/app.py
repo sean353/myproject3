@@ -55,35 +55,27 @@ class Customer(db.Model):
     loans= db.relationship("Loan",backref="customers", cascade="all, delete-orphan")
     
     
-
 class Loan(db.Model):
     __tablename__ = 'loans'
-    id = db.Column(db.Integer, primary_key=True,)
-    loan_date = db.Column(db.Date ,default = dt.now(), nullable=False)
-    return_date = db.Column(db.Date,nullable = True)
+    id = db.Column(db.Integer, primary_key=True)
+    loan_date = db.Column(db.DateTime, default=dt.now(), nullable=False)
+    return_date = db.Column(db.DateTime, nullable=True)
     is_returned = db.Column(db.Boolean, default=False, nullable=True)
-
 
     # Foreign keys referencing Customer and Book
     customer_id = db.Column(db.Integer, db.ForeignKey('customers.id'), nullable=False)
     book_id = db.Column(db.Integer, db.ForeignKey('books.id'), nullable=False)
     
-   
-
-    def __init__(self,customer_id,book_id):
+    def __init__(self, customer_id, book_id):
         book = Book.query.get(book_id)
         book_type = ic(book.book_type)
         if book_type == '1':
             self.return_date = dt.now() + timedelta(days=10)
-            ic(self.return_date)
-        if book_type == '2':
+        elif book_type == '2':
             self.return_date = dt.now() + timedelta(days=5)
-        if book_type == '3':
-            self.return_date = dt.now() + timedelta(days=2)
-        return_date = self.return_date
-        ic(return_date)
-        super().__init__(customer_id=customer_id,book_id=book_id)
-
+        elif book_type == '3':
+            self.return_date = dt.now() + timedelta(minutes=1)
+        super().__init__(customer_id=customer_id, book_id=book_id)
 
     def is_return_date_passed(self):
         """
@@ -91,14 +83,17 @@ class Loan(db.Model):
 
         Returns:
             bool: True if the return date has passed, False otherwise.
-
         """
-       
-        if (dt.now().date()) > self.return_date:
+        current_time = dt.now()
+        return_time = self.return_date
+
+        # Calculate the difference in minutes
+        time_difference = (return_time - current_time).total_seconds() / 60
+
+        # Check if the return date has passed
+        if time_difference <= 0:
             return True
         return False
-
-
 
 
 def generate_token(user_id):
@@ -303,6 +298,9 @@ def list_loans():
     loans = Loan.query.join(Customer, Loan.customer_id == Customer.id).join(Book, Loan.book_id == Book.id).all()
 
     # Create a list of dictionaries containing loan information, customer name, book name, and max_loan_duration
+
+    
+
     loan_list = [
         {
             'loan_date': loan.loan_date.strftime('%Y-%m-%d'),  # Format loan_date as 'YYYY-MM-DD'
@@ -312,13 +310,21 @@ def list_loans():
             'max_loan_duration': {
                 '1': "10 days",
                 '2': "5 days",
-                '3': "2 days"
+                '3': "one minute unitesting"
             }.get(loan.books.book_type, 0),  # Calculate max_loan_duration based on book_type
             'return_status': "Returned" if loan.is_returned else "Not Returned",  # Add return_status based on return_date
-            'availability_status': is_book_available(loan.books.id)  # Check book availability
+            'availability_status': is_book_available(loan.books.id),  # Check book availability
+            'is_over_due': loan.is_return_date_passed()
+            
         }
         for loan in loans
     ]
+
+    for loan in loan_list:
+        ic(loan["is_over_due"])
+       
+       
+       
 
     # Return the list of loans as JSON
     return jsonify({'loans': loan_list})

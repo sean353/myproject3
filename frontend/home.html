@@ -11,60 +11,88 @@
 
     <style>
         body {
-            background-color: black;
-            color: white;
+            background-color: #f8f9fa;
+            color: #212529;
+            font-family: Arial, sans-serif;
         }
 
-        .btn {
-            color: white;
+        .container {
+            padding-top: 50px;
+        }
+
+        .card {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+
+        .card-text {
+            font-size: 1rem;
+        }
+
+        .btn-primary,
+        .btn-info,
+        .btn-success {
+            background-color: #007bff;
+            border-color: #007bff;
         }
 
         .btn-outline-danger {
             color: #dc3545;
+            border-color: #dc3545;
         }
 
         .btn-warning {
-            color: #ffc107;
+            background-color: #ffc107;
+            border-color: #ffc107;
         }
 
-        .btn-info {
-            color: #17a2b8;
+        .btn-primary:hover,
+        .btn-info:hover,
+        .btn-success:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
         }
 
-        .btn-success {
-            color: #28a745;
+        .btn-outline-danger:hover {
+            color: #fff;
+            background-color: #dc3545;
+            border-color: #dc3545;
         }
 
-        .card {
-            background-color: #343a40;
-            color: white;
+        .btn-warning:hover {
+            background-color: #e0a800;
+            border-color: #d39e00;
         }
 
-        .card-body {
-            padding: 20px;
+        .btn {
+            color: #fff;
+            border-radius: 4px;
         }
 
-        h1,
-        h5 {
-            color: white;
+        .float-right .btn {
+            margin-left: 10px;
         }
     </style>
 </head>
 
 <body>
-    <div class="float-right mt-2">
-        <button type="button" class="btn btn-outline-danger" onclick="logout()">Logout</button>
-        <button type="button" class="btn btn-outline-danger" onclick="unitTest()">unit test</button>
-        <a href="/frontend/login.html" class="btn btn-primary" onclick="login()">login</a>
+    <div class="container">
+        <div class="float-right mt-2">
+            <button type="button" class="btn btn-outline-danger" onclick="logout()">Logout</button>
+            <button type="button" class="btn btn-outline-danger" onclick="unitTest()">Unit Test</button>
+            <a href="/frontend/login.html" class="btn btn-primary" onclick="login()">Login</a>
+        </div>
 
-    </div>
-    </div>
-
-    <div class="container mt-5">
         <h1 class="mb-4">Welcome to the Library</h1>
 
         <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-4 mb-4">
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Display All Books</h5>
@@ -75,7 +103,7 @@
                 </div>
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-4 mb-4">
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Display All Customers</h5>
@@ -86,7 +114,7 @@
                 </div>
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-4 mb-4">
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Display All Loans</h5>
@@ -98,8 +126,8 @@
             </div>
         </div>
 
-        <div class="row mt-4">
-            <div class="col-md-4">
+        <div class="row">
+            <div class="col-md-4 mb-4">
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Find Book by Name</h5>
@@ -109,7 +137,7 @@
                 </div>
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-4 mb-4">
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Find Customer by Name</h5>
@@ -120,7 +148,7 @@
                 </div>
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-4 mb-4">
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Add a Book</h5>
@@ -130,9 +158,6 @@
                 </div>
             </div>
         </div>
-        <br>
-
-
     </div>
 
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
@@ -158,7 +183,6 @@
                         }
                     }
                 );
-
 
                 Toastify({
                     text: "Logout successful. Goodbye!",
