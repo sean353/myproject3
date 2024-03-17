@@ -1,4 +1,4 @@
-
+from werkzeug.utils import secure_filename
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, request, jsonify
@@ -6,7 +6,7 @@ from datetime import datetime as dt, timedelta
 from flask_jwt_extended import JWTManager , create_access_token
 from icecream import ic 
 import datetime 
-import json,time,os
+import time,os
 from functools import wraps
 from flask_cors import CORS, cross_origin
 # from sqlalchemy.orm import class_mapper
@@ -37,6 +37,7 @@ class Book(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(45), nullable=False)
     author = db.Column(db.String(45), nullable=False)
+    image = db.Column(db.String(200), nullable=True)
     year_published = db.Column(db.String(45), nullable=False)
     book_type = db.Column(db.String(100), nullable=False)
     loans= db.relationship("Loan",backref="books", cascade="all, delete-orphan")
@@ -278,16 +279,32 @@ def add_loan():
 
 
 
+UPLOAD_FOLDER = 'uploads'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
 @app.route('/addbook', methods=['POST'])
 @jwt_required() 
 def add_book():
     data = request.get_json()
-    print(data)
-
     name = data.get('name')
     author = data.get('author')
     year_published = data.get('year_published')
     book_type = data.get('book_type')
+
+    # Check if the POST request contains the file part
+    if 'image' not in request.files:
+        return jsonify({'error': 'No file part'}), 400
+
+    image_file = request.files['image']
+
+    # Check if the file is not empty
+    if image_file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+
+    # Save the file to the uploads folder
+    filename = secure_filename(image_file.filename)
+    image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    image_file.save(image_path)
 
     # Determine the maximum loan duration based on the book type
     max_loan_duration = {
@@ -296,7 +313,7 @@ def add_book():
         '3': 2
     }.get(book_type, 0)
 
-    new_book = Book(name=name, author=author, year_published=year_published, book_type=book_type)
+    new_book = Book(name=name, author=author, year_published=year_published, book_type=book_type, image=image_path)
 
     db.session.add(new_book)
     db.session.commit()
