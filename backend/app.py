@@ -136,6 +136,13 @@ def model_to_dict(model):
 
 
 
+
+
+@app.route('/hello', methods=['GET'])
+def hello():
+    return("hello")
+
+
 # Define protected routes
 @app.route('/protected_route', methods=['GET'])
 @jwt_required()  # This route requires a valid JWT token
